@@ -121,8 +121,8 @@ $$\text{Composite Score} = 0.25\text{Fund} + 0.20\text{Tech} + 0.15\text{Val} + 
 
 ### 1. Clone & Install Dependencies
 ```bash
-git clone https://github.com/AnshJain-99/GetStockIQ.git
-cd GetStockIQ
+git clone https://github.com/harshitsharma1845/GetStocksIQ.git
+cd GetStocksIQ
 
 # Create and activate virtual environment
 python -m venv venv
@@ -174,6 +174,6 @@ This application is developed for educational and quantitative research purposes
 
 ## 👤 Author & Maintainer
 
-**Ansh Jain**  
-* GitHub: [@AnshJain-99](https://github.com/AnshJain-99)  
-* Repository: [AnshJain-99/GetStockIQ](https://github.com/AnshJain-99/GetStockIQ)
+**Harshit Sharma**  
+* GitHub: [@harshitsharma1845](https://github.com/harshitsharma1845)  
+* Repository: [harshitsharma1845/GetStocksIQ](https://github.com/harshitsharma1845/GetStocksIQ)
