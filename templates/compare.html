@@ -1,0 +1,1104 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/compare.css') }}">
+{% endblock %}
+
+{% block title %}
+Compare Stocks
+{% endblock %}
+
+{% block content %}
+
+<div class="compare-page">
+
+    <!-- BREADCRUMB -->
+
+    <div class="compare-breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Home</a>
+        <span>›</span>
+        <p>Compare Stocks</p>
+    </div>
+
+
+    <!-- COMPARE STOCK CARD -->
+
+    <div class="compare-selection-card">
+
+        <div class="compare-card-header">
+
+            <div>
+                <h1>Compare Stocks</h1>
+                <p>Select two or three stocks to compare their performance.</p>
+            </div>
+
+            <div class="sector-filter">
+
+                <label for="sectorSelect">Sector</label>
+
+                <select id="sectorSelect">
+                    <option value="all">All</option>
+                    <option value="technology">Technology</option>
+                    <option value="banking">Banking</option>
+                    <option value="automobile">Automobile</option>
+                    <option value="energy">Energy</option>
+                    <option value="pharma">Pharmaceutical</option>
+                    <option value="fmcg">FMCG</option>
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- STOCK SELECTION BOXES -->
+
+        <div class="stock-selection-grid">
+
+            <!-- STOCK 1 -->
+
+            <button
+                type="button"
+                class="add-stock-box"
+                data-slot="0"
+                onclick="openStockModal(0)"
+            >
+
+                <div class="add-stock-icon">
+                    <i class="bi bi-plus-lg"></i>
+                </div>
+
+                <span>Add Stock</span>
+
+            </button>
+
+
+            <!-- STOCK 2 -->
+
+            <button
+                type="button"
+                class="add-stock-box"
+                data-slot="1"
+                onclick="openStockModal(1)"
+            >
+
+                <div class="add-stock-icon">
+                    <i class="bi bi-plus-lg"></i>
+                </div>
+
+                <span>Add Stock</span>
+
+            </button>
+
+
+            <!-- STOCK 3 -->
+
+            <button
+                type="button"
+                class="add-stock-box"
+                data-slot="2"
+                onclick="openStockModal(2)"
+            >
+
+                <div class="add-stock-icon">
+                    <i class="bi bi-plus-lg"></i>
+                </div>
+
+                <span>Add Stock</span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- COMPARE BUTTON -->
+
+    <div class="compare-button-wrapper">
+
+        <button
+            type="button"
+            id="compareStocksButton"
+            class="compare-stocks-button"
+            onclick="compareSelectedStocks()"
+            disabled
+        >
+
+            Compare Stocks
+
+        </button>
+
+    </div>
+
+
+    <!-- POPULAR COMPARISONS -->
+
+    <section class="popular-comparison-section">
+
+        <div class="popular-heading">
+
+            <div>
+
+                <span class="small-section-title">
+                    Popular Comparisons
+                </span>
+
+                <h2>
+                    Compare Popular Stocks
+                </h2>
+
+                <p>
+                    Select a popular comparison to quickly compare leading
+                    Indian companies.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="popular-comparison-grid">
+
+
+            <!-- TCS VS INFOSYS -->
+
+            <button
+                type="button"
+                class="popular-comparison-card"
+                onclick="openPopularComparison('TCS', 'INFY')"
+            >
+
+                <div class="popular-company">
+
+                    <div class="company-logo">
+                        T
+                    </div>
+
+                    <div>
+                        <h4>Tata Consultancy Services</h4>
+                        <span>TCS</span>
+                    </div>
+
+                </div>
+
+
+                <div class="versus-circle">
+                    VS
+                </div>
+
+
+                <div class="popular-company">
+
+                    <div class="company-logo">
+                        I
+                    </div>
+
+                    <div>
+                        <h4>Infosys Limited</h4>
+                        <span>INFY</span>
+                    </div>
+
+                </div>
+
+            </button>
+
+
+            <!-- RELIANCE VS ADANI -->
+
+            <button
+                type="button"
+                class="popular-comparison-card"
+                onclick="openPopularComparison('RELIANCE', 'ADANIENT')"
+            >
+
+                <div class="popular-company">
+
+                    <div class="company-logo">
+                        R
+                    </div>
+
+                    <div>
+                        <h4>Reliance Industries</h4>
+                        <span>RELIANCE</span>
+                    </div>
+
+                </div>
+
+
+                <div class="versus-circle">
+                    VS
+                </div>
+
+
+                <div class="popular-company">
+
+                    <div class="company-logo">
+                        A
+                    </div>
+
+                    <div>
+                        <h4>Adani Enterprises</h4>
+                        <span>ADANIENT</span>
+                    </div>
+
+                </div>
+
+            </button>
+
+
+            <!-- HDFC VS ICICI -->
+
+            <button
+                type="button"
+                class="popular-comparison-card"
+                onclick="openPopularComparison('HDFCBANK', 'ICICIBANK')"
+            >
+
+                <div class="popular-company">
+
+                    <div class="company-logo">
+                        H
+                    </div>
+
+                    <div>
+                        <h4>HDFC Bank</h4>
+                        <span>HDFCBANK</span>
+                    </div>
+
+                </div>
+
+
+                <div class="versus-circle">
+                    VS
+                </div>
+
+
+                <div class="popular-company">
+
+                    <div class="company-logo">
+                        I
+                    </div>
+
+                    <div>
+                        <h4>ICICI Bank</h4>
+                        <span>ICICIBANK</span>
+                    </div>
+
+                </div>
+
+            </button>
+
+
+            <!-- MARUTI VS TATA MOTORS -->
+
+            <button
+                type="button"
+                class="popular-comparison-card"
+                onclick="openPopularComparison('MARUTI', 'TATAMOTORS')"
+            >
+
+                <div class="popular-company">
+
+                    <div class="company-logo">
+                        M
+                    </div>
+
+                    <div>
+                        <h4>Maruti Suzuki</h4>
+                        <span>MARUTI</span>
+                    </div>
+
+                </div>
+
+
+                <div class="versus-circle">
+                    VS
+                </div>
+
+
+                <div class="popular-company">
+
+                    <div class="company-logo">
+                        T
+                    </div>
+
+                    <div>
+                        <h4>Tata Motors</h4>
+                        <span>TATAMOTORS</span>
+                    </div>
+
+                </div>
+
+            </button>
+
+
+            <!-- HUL VS NESTLE -->
+
+            <button
+                type="button"
+                class="popular-comparison-card"
+                onclick="openPopularComparison('HINDUNILVR', 'NESTLEIND')"
+            >
+
+                <div class="popular-company">
+
+                    <div class="company-logo">
+                        H
+                    </div>
+
+                    <div>
+                        <h4>Hindustan Unilever</h4>
+                        <span>HINDUNILVR</span>
+                    </div>
+
+                </div>
+
+
+                <div class="versus-circle">
+                    VS
+                </div>
+
+
+                <div class="popular-company">
+
+                    <div class="company-logo">
+                        N
+                    </div>
+
+                    <div>
+                        <h4>Nestlé India</h4>
+                        <span>NESTLEIND</span>
+                    </div>
+
+                </div>
+
+            </button>
+
+
+            <!-- SBI VS BAJAJ FINANCE -->
+
+            <button
+                type="button"
+                class="popular-comparison-card"
+                onclick="openPopularComparison('SBIN', 'BAJFINANCE')"
+            >
+
+                <div class="popular-company">
+
+                    <div class="company-logo">
+                        S
+                    </div>
+
+                    <div>
+                        <h4>State Bank of India</h4>
+                        <span>SBIN</span>
+                    </div>
+
+                </div>
+
+
+                <div class="versus-circle">
+                    VS
+                </div>
+
+
+                <div class="popular-company">
+
+                    <div class="company-logo">
+                        B
+                    </div>
+
+                    <div>
+                        <h4>Bajaj Finance</h4>
+                        <span>BAJFINANCE</span>
+                    </div>
+
+                </div>
+
+            </button>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+
+<!-- STOCK SEARCH MODAL -->
+
+<div
+    class="compare-stock-modal"
+    id="compareStockModal"
+>
+
+    <div class="compare-modal-overlay"
+         onclick="closeStockModal()">
+    </div>
+
+
+    <div class="compare-modal-content">
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="compare-modal-header">
+
+            <div>
+
+                <h2>
+                    Add Stock
+                </h2>
+
+                <p>
+                    Search and select a company for comparison.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="close-compare-modal"
+                onclick="closeStockModal()"
+            >
+
+                <i class="bi bi-x-lg"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- SEARCH INPUT -->
+
+        <div class="compare-search-wrapper">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                id="compareStockSearch"
+                placeholder="Search stocks..."
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <!-- SEARCH STATUS -->
+
+        <div
+            class="compare-search-status"
+            id="compareSearchStatus"
+        >
+
+            Search a company by name or symbol.
+
+        </div>
+
+
+        <!-- SEARCH RESULTS -->
+
+        <div
+            class="compare-search-results"
+            id="compareSearchResults"
+        >
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    let activeStockSlot = null;
+
+    let selectedStocks = [
+        null,
+        null,
+        null
+    ];
+
+
+    const stockModal =
+        document.getElementById("compareStockModal");
+
+    const stockSearchInput =
+        document.getElementById("compareStockSearch");
+
+    const stockSearchResults =
+        document.getElementById("compareSearchResults");
+
+    const stockSearchStatus =
+        document.getElementById("compareSearchStatus");
+
+    const compareButton =
+        document.getElementById("compareStocksButton");
+
+
+    let searchTimer;
+
+
+    /* OPEN STOCK MODAL */
+
+    function openStockModal(slot) {
+
+        activeStockSlot = slot;
+
+        stockModal.classList.add("show");
+
+        document.body.classList.add(
+            "compare-modal-open"
+        );
+
+        stockSearchInput.value = "";
+
+        stockSearchResults.innerHTML = "";
+
+        stockSearchStatus.innerHTML =
+            "Search a company by name or symbol.";
+
+        setTimeout(() => {
+
+            stockSearchInput.focus();
+
+        }, 100);
+
+    }
+
+
+    /* CLOSE MODAL */
+
+    function closeStockModal() {
+
+        stockModal.classList.remove("show");
+
+        document.body.classList.remove(
+            "compare-modal-open"
+        );
+
+    }
+
+
+    /* SEARCH STOCK */
+
+    stockSearchInput.addEventListener(
+        "input",
+
+        function () {
+
+            clearTimeout(searchTimer);
+
+            const query =
+                this.value.trim();
+
+
+            if (query.length < 2) {
+
+                stockSearchResults.innerHTML = "";
+
+                stockSearchStatus.innerHTML =
+                    "Enter at least 2 characters.";
+
+                return;
+
+            }
+
+
+            stockSearchStatus.innerHTML =
+                "Searching stocks...";
+
+
+            searchTimer = setTimeout(
+
+                async function () {
+
+                    try {
+
+                        const response =
+                            await fetch(
+
+                                `/api/search-stocks?q=${encodeURIComponent(query)}`
+
+                            );
+
+
+                        const stocks =
+                            await response.json();
+
+
+                        displayStockResults(stocks);
+
+
+                    }
+
+                    catch (error) {
+
+                        stockSearchStatus.innerHTML =
+                            "Unable to search stocks.";
+
+                    }
+
+                },
+
+                350
+
+            );
+
+        }
+
+    );
+
+
+    /* DISPLAY SEARCH RESULTS */
+
+    function displayStockResults(stocks) {
+
+        stockSearchResults.innerHTML = "";
+
+
+        if (!stocks || stocks.length === 0) {
+
+            stockSearchStatus.innerHTML =
+                "No stocks found.";
+
+            return;
+
+        }
+
+
+        stockSearchStatus.innerHTML =
+            `${stocks.length} stocks found`;
+
+
+        stocks.forEach(
+
+            function (stock) {
+
+
+                const symbol =
+
+                    (
+                        stock.display_symbol ||
+                        stock.symbol ||
+                        ""
+                    )
+
+                    .replace(".NS", "")
+
+                    .replace(".BO", "");
+
+
+                const companyName =
+
+                    stock.name ||
+
+                    stock.longname ||
+
+                    stock.shortname ||
+
+                    symbol;
+
+
+                const stockItem =
+
+                    document.createElement(
+                        "button"
+                    );
+
+
+                stockItem.type = "button";
+
+                stockItem.className =
+                    "compare-search-item";
+
+
+                stockItem.innerHTML = `
+
+                    <div class="search-stock-logo">
+
+                        ${companyName
+                            .charAt(0)
+                            .toUpperCase()}
+
+                    </div>
+
+
+                    <div class="search-stock-information">
+
+                        <h4>
+
+                            ${companyName}
+
+                        </h4>
+
+                        <p>
+
+                            Stock • ${symbol}
+
+                        </p>
+
+                    </div>
+
+
+                    <i class="bi bi-plus-circle">
+
+                    </i>
+
+                `;
+
+
+                stockItem.onclick = function () {
+
+                    selectStock(
+
+                        symbol,
+
+                        companyName
+
+                    );
+
+                };
+
+
+                stockSearchResults.appendChild(
+
+                    stockItem
+
+                );
+
+            }
+
+        );
+
+    }
+
+
+    /* SELECT STOCK */
+
+    function selectStock(
+
+        symbol,
+
+        companyName
+
+    ) {
+
+
+        const alreadySelected =
+
+            selectedStocks.some(
+
+                function (stock) {
+
+                    return (
+
+                        stock &&
+
+                        stock.symbol === symbol
+
+                    );
+
+                }
+
+            );
+
+
+        if (alreadySelected) {
+
+            stockSearchStatus.innerHTML =
+
+                "This stock is already selected.";
+
+            return;
+
+        }
+
+
+        selectedStocks[activeStockSlot] = {
+
+            symbol: symbol,
+
+            name: companyName
+
+        };
+
+
+        updateStockBoxes();
+
+        closeStockModal();
+
+    }
+
+
+    /* UPDATE STOCK CARDS */
+
+    function updateStockBoxes() {
+
+
+        const stockBoxes =
+
+            document.querySelectorAll(
+
+                ".add-stock-box"
+
+            );
+
+
+        stockBoxes.forEach(
+
+            function (
+
+                stockBox,
+
+                index
+
+            ) {
+
+
+                const stock =
+
+                    selectedStocks[index];
+
+
+                if (!stock) {
+
+
+                    stockBox.classList.remove(
+
+                        "selected"
+
+                    );
+
+
+                    stockBox.innerHTML = `
+
+                        <div class="add-stock-icon">
+
+                            <i class="bi bi-plus-lg">
+
+                            </i>
+
+                        </div>
+
+                        <span>
+
+                            Add Stock
+
+                        </span>
+
+                    `;
+
+
+                }
+
+
+                else {
+
+
+                    stockBox.classList.add(
+
+                        "selected"
+
+                    );
+
+
+                    stockBox.innerHTML = `
+
+                        <div class="selected-stock-logo">
+
+                            ${stock.name
+                                .charAt(0)
+                                .toUpperCase()}
+
+                        </div>
+
+
+                        <div class="selected-stock-details">
+
+                            <h4>
+
+                                ${stock.name}
+
+                            </h4>
+
+                            <p>
+
+                                ${stock.symbol}
+
+                            </p>
+
+                        </div>
+
+
+                        <span
+
+                            class="remove-selected-stock"
+
+                            onclick="removeSelectedStock(
+
+                                event,
+
+                                ${index}
+
+                            )"
+
+                        >
+
+                            <i class="bi bi-x-lg">
+
+                            </i>
+
+                        </span>
+
+                    `;
+
+                }
+
+            }
+
+        );
+
+
+        updateCompareButton();
+
+    }
+
+
+    /* REMOVE STOCK */
+
+    function removeSelectedStock(
+
+        event,
+
+        index
+
+    ) {
+
+        event.stopPropagation();
+
+        selectedStocks[index] = null;
+
+        updateStockBoxes();
+
+    }
+
+
+    /* ENABLE COMPARE BUTTON */
+
+    function updateCompareButton() {
+
+
+        const stockCount =
+
+            selectedStocks.filter(
+
+                Boolean
+
+            ).length;
+
+
+        compareButton.disabled =
+
+            stockCount < 2;
+
+    }
+
+
+    /* OPEN COMPARISON */
+
+    function compareSelectedStocks() {
+
+
+        const symbols =
+
+            selectedStocks
+
+            .filter(Boolean)
+
+            .map(
+
+                function (stock) {
+
+                    return stock.symbol;
+
+                }
+
+            );
+
+
+        if (symbols.length < 2) {
+
+            return;
+
+        }
+
+
+        if (window.showTradingOverlay) {
+            window.showTradingOverlay(null, 'Comparing Selected Stocks...');
+        }
+
+        window.location.href =
+            `/compare-results?symbols=${
+                encodeURIComponent(
+                    symbols.join(",")
+                )
+            }`;
+
+    }
+
+
+    /* POPULAR COMPARISON */
+
+    function openPopularComparison(
+        firstStock,
+        secondStock
+    ) {
+        if (window.showTradingOverlay) {
+            window.showTradingOverlay(null, `Comparing ${firstStock} vs ${secondStock}...`);
+        }
+
+        window.location.href =
+            `/compare-results?symbols=${
+                firstStock
+            },${
+                secondStock
+            }`;
+
+    }
+
+
+    /* ESCAPE KEY */
+
+    document.addEventListener(
+
+        "keydown",
+
+        function (event) {
+
+
+            if (
+
+                event.key === "Escape"
+
+            ) {
+
+                closeStockModal();
+
+            }
+
+        }
+
+    );
+
+</script>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/compare.js') }}"></script>
+{% endblock %}

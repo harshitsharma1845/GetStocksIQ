@@ -1,0 +1,3458 @@
+/* ==========================================================================
+   INVESTIQ COMPARE STOCKS & COMPARISON RESULTS — MODERN FINTECH DESIGN SYSTEM
+   Optimized for 1920x1080 @ 100% Zoom down to Mobile Viewports
+   ========================================================================== */
+
+:root {
+    --compare-primary: #7c3aed;
+    --compare-primary-hover: #6d28d9;
+    --compare-primary-light: #f5f3ff;
+    --compare-primary-border: #ddd6fe;
+    --compare-bg: #f8fafc;
+    --compare-surface: #ffffff;
+    --compare-border: #e2e8f0;
+    --compare-border-subtle: #f1f5f9;
+    --compare-text: #0f172a;
+    --compare-text-secondary: #475569;
+    --compare-text-muted: #94a3b8;
+    --compare-success: #10b981;
+    --compare-danger: #ef4444;
+    --compare-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+    --compare-shadow-hover: 0 10px 30px rgba(15, 23, 42, 0.08);
+    --compare-radius: 16px;
+    --compare-radius-sm: 10px;
+    --compare-font: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ==========================================================================
+   PAGE CONTAINERS
+   ========================================================================== */
+
+.compare-page,
+.comparison-results-page {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 24px 64px;
+    font-family: var(--compare-font);
+    color: var(--compare-text);
+}
+
+/* ==========================================================================
+   BREADCRUMBS
+   ========================================================================== */
+
+.compare-breadcrumb,
+.results-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--compare-text-muted);
+}
+
+.compare-breadcrumb a,
+.results-breadcrumb a {
+    color: var(--compare-text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s ease;
+}
+
+.compare-breadcrumb a:hover,
+.results-breadcrumb a:hover {
+    color: var(--compare-primary);
+}
+
+.compare-breadcrumb i,
+.results-breadcrumb i,
+.compare-breadcrumb span,
+.results-breadcrumb span {
+    font-size: 12px;
+    color: var(--compare-text-muted);
+}
+
+.results-breadcrumb span:last-child {
+    color: var(--compare-primary);
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   PAGE HEADERS
+   ========================================================================== */
+
+.comparison-page-header {
+    margin-bottom: 28px;
+}
+
+.header-main-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.header-titles {
+    flex: 1 1 500px;
+    min-width: 0;
+}
+
+.header-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.compare-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--compare-primary-light);
+    color: var(--compare-primary);
+    border: 1px solid var(--compare-primary-border);
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.comparison-updated-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--compare-text-muted);
+}
+
+.header-titles h1 {
+    margin: 0 0 8px;
+    color: var(--compare-text);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+}
+
+.header-stock-name {
+    color: var(--compare-text);
+}
+
+.header-vs {
+    display: inline-block;
+    margin: 0 8px;
+    color: var(--compare-primary);
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.header-subtitle {
+    margin: 0;
+    color: var(--compare-text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 680px;
+}
+
+/* Stock Controls / Chips Card */
+.comparison-controls-card {
+    background: var(--compare-surface);
+    border: 1px solid var(--compare-border);
+    border-radius: var(--compare-radius-sm);
+    padding: 12px 16px;
+    box-shadow: var(--compare-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.controls-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--compare-text-muted);
+}
+
+.selected-stock-chips {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.stock-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    background: #f8fafc;
+    border: 1px solid var(--compare-border);
+    border-radius: 999px;
+    transition: all 0.15s ease;
+}
+
+.stock-chip:hover {
+    border-color: var(--compare-primary-border);
+    background: var(--compare-primary-light);
+}
+
+.chip-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.chip-details {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chip-details strong {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--compare-text);
+}
+
+.chip-details span {
+    font-size: 11.5px;
+    color: var(--compare-text-secondary);
+}
+
+.remove-chip-btn {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    color: var(--compare-text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    transition: all 0.15s ease;
+}
+
+.remove-chip-btn:hover {
+    background: #fee2e2;
+    color: var(--compare-danger);
+}
+
+.add-chip-btn,
+.edit-comparison-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: #ffffff;
+    border: 1px dashed var(--compare-primary);
+    border-radius: 999px;
+    color: var(--compare-primary);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.add-chip-btn:hover,
+.edit-comparison-btn:hover {
+    background: var(--compare-primary-light);
+    border-style: solid;
+}
+
+/* ==========================================================================
+   COMMON SECTION TITLES
+   ========================================================================== */
+
+.section-title-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.section-eyebrow {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--compare-primary);
+    margin-bottom: 2px;
+}
+
+.section-title-row h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--compare-text);
+    letter-spacing: -0.01em;
+}
+
+.section-subtitle {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--compare-text-secondary);
+}
+
+/* Common Panels */
+.comparison-panel {
+    background: var(--compare-surface);
+    border: 1px solid var(--compare-border);
+    border-radius: var(--compare-radius);
+    padding: 20px 24px;
+    box-shadow: var(--compare-shadow);
+    transition: box-shadow 0.2s ease;
+}
+
+.comparison-panel:hover {
+    box-shadow: var(--compare-shadow-hover);
+}
+
+.comparison-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.panel-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--compare-text-muted);
+}
+
+.comparison-panel-heading h2 {
+    margin: 2px 0 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--compare-text);
+}
+
+.panel-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--compare-primary-light);
+    color: var(--compare-primary);
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.panel-description {
+    margin: 0 0 16px;
+    font-size: 13px;
+    color: var(--compare-text-secondary);
+}
+
+/* ==========================================================================
+   1. QUICK COMPARISON (SUMMARY CARDS)
+   ========================================================================== */
+
+.summary-cards-section {
+    margin-bottom: 32px;
+}
+
+.summary-cards-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.summary-cards-grid.grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.summary-cards-grid.grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.summary-stock-card {
+    background: var(--compare-surface);
+    border: 1px solid var(--compare-border);
+    border-radius: var(--compare-radius);
+    padding: 18px 20px;
+    box-shadow: var(--compare-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.summary-stock-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--compare-shadow-hover);
+}
+
+.summary-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.summary-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.summary-logo-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
+}
+
+.summary-brand-info {
+    min-width: 0;
+}
+
+.summary-brand-info h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 650;
+    color: var(--compare-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.summary-tags {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.ticker-tag {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--compare-primary);
+    background: var(--compare-primary-light);
+    padding: 2px 7px;
+    border-radius: 6px;
+}
+
+.sector-tag {
+    font-size: 11px;
+    color: var(--compare-text-secondary);
+    background: #f1f5f9;
+    padding: 2px 7px;
+    border-radius: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.summary-price-block {
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid var(--compare-border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.price-value-row {
+    display: flex;
+    flex-direction: column;
+}
+
+.current-price-label {
+    font-size: 11px;
+    color: var(--compare-text-muted);
+}
+
+.summary-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--compare-text);
+    letter-spacing: -0.01em;
+}
+
+.price-exchange-tag {
+    font-size: 11px;
+    color: var(--compare-text-muted);
+    font-weight: 500;
+}
+
+.summary-metric-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding-top: 4px;
+    border-top: 1px solid var(--compare-border-subtle);
+}
+
+.metric-stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-name {
+    font-size: 11px;
+    color: var(--compare-text-muted);
+    margin-bottom: 2px;
+}
+
+.stat-val {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--compare-text);
+}
+
+.summary-card-footer {
+    padding-top: 8px;
+    border-top: 1px solid var(--compare-border-subtle);
+    margin-top: auto;
+}
+
+.card-detail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--compare-primary);
+    text-decoration: none;
+    transition: gap 0.15s ease;
+}
+
+.card-detail-link:hover {
+    gap: 9px;
+}
+
+.na-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   2. COMPARISON MATRIX (SIDE-BY-SIDE TABLE)
+   ========================================================================== */
+
+.comparison-matrix-section {
+    margin-bottom: 32px;
+}
+
+.table-scroll-hint {
+    display: none;
+    font-size: 12px;
+    color: var(--compare-text-muted);
+}
+
+.matrix-table-card {
+    background: var(--compare-surface);
+    border: 1px solid var(--compare-border);
+    border-radius: var(--compare-radius);
+    box-shadow: var(--compare-shadow);
+    overflow: hidden;
+}
+
+.table-responsive-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13.5px;
+}
+
+.matrix-table thead {
+    background: #f8fafc;
+    border-bottom: 1px solid var(--compare-border);
+}
+
+.matrix-table th {
+    padding: 14px 18px;
+    font-weight: 600;
+    color: var(--compare-text-secondary);
+}
+
+.metric-col-header {
+    width: 28%;
+    min-width: 180px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.stock-col-header {
+    min-width: 180px;
+}
+
+.stock-header-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cell-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.stock-header-cell strong {
+    display: block;
+    color: var(--compare-text);
+    font-size: 14px;
+}
+
+.stock-header-cell span {
+    display: block;
+    font-size: 11px;
+    color: var(--compare-text-muted);
+    font-weight: 400;
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.matrix-table tbody tr {
+    border-bottom: 1px solid var(--compare-border-subtle);
+    transition: background 0.15s ease;
+}
+
+.matrix-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.matrix-table tbody tr:hover {
+    background: #fbfbfe;
+}
+
+.matrix-table td {
+    padding: 12px 18px;
+    color: var(--compare-text);
+    vertical-align: middle;
+}
+
+.metric-title-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    color: var(--compare-text-secondary);
+}
+
+.metric-icon {
+    color: var(--compare-primary);
+    font-size: 15px;
+    width: 18px;
+}
+
+.stock-data-cell {
+    font-size: 13.5px;
+}
+
+.font-semibold {
+    font-weight: 650;
+}
+
+.sector-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    background: #f1f5f9;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--compare-text-secondary);
+}
+
+/* ==========================================================================
+   3. LIVE MARKET & HISTORICAL CHARTS SECTION
+   ========================================================================== */
+
+.charts-comparison-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+/* Live Market Share Price */
+.live-market-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.live-price-bars-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 8px 0 20px;
+}
+
+.live-price-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.price-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.stock-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.stock-meta-symbol {
+    font-weight: 700;
+    font-size: 13.5px;
+    color: var(--compare-text);
+}
+
+.stock-meta-name {
+    font-size: 12px;
+    color: var(--compare-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.stock-meta-price {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--compare-text);
+}
+
+.price-bar-track {
+    width: 100%;
+    height: 10px;
+    background: #f1f5f9;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.price-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #7c3aed, #9333ea);
+    transition: width 0.6s ease-out;
+}
+
+.live-price-row:nth-child(2) .price-bar-fill {
+    background: linear-gradient(90deg, #2563eb, #3b82f6);
+}
+
+.live-price-row:nth-child(3) .price-bar-fill {
+    background: linear-gradient(90deg, #059669, #10b981);
+}
+
+.chart-footer-note {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: var(--compare-text-muted);
+    padding-top: 12px;
+    border-top: 1px solid var(--compare-border-subtle);
+}
+
+/* Historical Chart Panel */
+.historical-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-period-buttons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f1f5f9;
+    padding: 3px;
+    border-radius: 8px;
+}
+
+.chart-period-buttons button {
+    padding: 4px 10px;
+    border: none;
+    background: transparent;
+    color: var(--compare-text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.chart-period-buttons button:hover {
+    color: var(--compare-primary);
+}
+
+.chart-period-buttons button.active {
+    background: #ffffff;
+    color: var(--compare-primary);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.historical-chart-container {
+    position: relative;
+    width: 100%;
+    height: 290px;
+    margin-top: 8px;
+}
+
+/* ==========================================================================
+   4. FINANCIAL FUNDAMENTALS (2-COLUMN GRID)
+   ========================================================================== */
+
+.financial-fundamentals-section {
+    margin-bottom: 32px;
+}
+
+.fundamentals-2col-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.fundamental-metric-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px 20px;
+}
+
+.fundamental-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.metric-badge-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.metric-icon-box {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--compare-primary-light);
+    color: var(--compare-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+
+.metric-category {
+    display: block;
+    font-size: 11px;
+    color: var(--compare-text-muted);
+    font-weight: 500;
+}
+
+.fundamental-card-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--compare-text);
+}
+
+.metric-info-tooltip {
+    color: var(--compare-text-muted);
+    font-size: 15px;
+    cursor: help;
+}
+
+.fundamental-bars-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fundamental-bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bar-row-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bar-symbol {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--compare-text-secondary);
+}
+
+.bar-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--compare-text);
+}
+
+.fundamental-bar-track {
+    width: 100%;
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.fundamental-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #7c3aed, #9333ea);
+    transition: width 0.6s ease-out;
+}
+
+.fundamental-bar-row:nth-child(2) .fundamental-bar-fill {
+    background: linear-gradient(90deg, #2563eb, #3b82f6);
+}
+
+.fundamental-bar-row:nth-child(3) .fundamental-bar-fill {
+    background: linear-gradient(90deg, #059669, #10b981);
+}
+
+/* ==========================================================================
+   5. ABOUT THE COMPANIES (PROFILES)
+   ========================================================================== */
+
+.company-information-section {
+    margin-bottom: 32px;
+}
+
+.company-profiles-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.company-profiles-grid.grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.company-profiles-grid.grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.company-profile-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px;
+}
+
+.company-profile-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.profile-avatar-circle {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.profile-company-headings {
+    min-width: 0;
+}
+
+.profile-company-headings h3 {
+    margin: 0 0 3px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--compare-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-subtags {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.symbol-pill {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--compare-primary);
+    background: var(--compare-primary-light);
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+.sector-pill {
+    font-size: 11px;
+    color: var(--compare-text-secondary);
+    background: #f1f5f9;
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.company-profile-description {
+    flex: 1;
+}
+
+.company-profile-description p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--compare-text-secondary);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.company-profile-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--compare-border-subtle);
+    font-size: 12px;
+}
+
+.profile-industry-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--compare-text-muted);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+.visit-website-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--compare-primary);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.15s ease;
+    white-space: nowrap;
+}
+
+.visit-website-link:hover {
+    color: var(--compare-primary-hover);
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   INITIAL COMPARE SELECTION PAGE STYLES (`compare.html`)
+   ========================================================================== */
+
+.compare-selection-card {
+    background: var(--compare-surface);
+    border: 1px solid var(--compare-border);
+    border-radius: var(--compare-radius);
+    padding: 28px;
+    box-shadow: var(--compare-shadow);
+    margin-bottom: 24px;
+}
+
+.compare-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.compare-card-header h1 {
+    margin: 0 0 6px;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--compare-text);
+}
+
+.compare-card-header p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--compare-text-secondary);
+}
+
+.sector-filter {
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.sector-filter label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--compare-text-secondary);
+}
+
+.sector-filter select {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    background: #ffffff;
+    border: 1px solid var(--compare-border);
+    border-radius: var(--compare-radius-sm);
+    font-family: inherit;
+    font-size: 13.5px;
+    color: var(--compare-text);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.sector-filter select:focus {
+    border-color: var(--compare-primary);
+}
+
+.stock-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.add-stock-box {
+    min-height: 130px;
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: var(--compare-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 16px;
+    transition: all 0.18s ease;
+    text-align: center;
+}
+
+.add-stock-box:hover {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.highlight-row {
+    padding: 12px 14px;
+    background: #f8f9fc;
+    border: 1px solid #e1e4eb;
+    border-radius: 10px;
+}
+
+.highlight-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 9px;
+    color: #151d32;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.highlight-title i {
+    color: #7c3aed;
+}
+
+.highlight-stock-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.highlight-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    color: #30384b;
+    background: #ffffff;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.financial-chart-card {
+    min-height: 340px;
+}
+
+.financial-card-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.financial-card-heading h3 {
+    margin: 0;
+    color: #493cff;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.financial-card-heading i {
+    color: #303747;
+}
+
+.financial-bars {
+    display: flex;
+    height: 245px;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 55px;
+    margin-top: 25px;
+    padding: 20px 15px 0;
+    border-bottom: 1px solid #cfd4df;
+}
+
+.financial-bar-item {
+    display: flex;
+    width: 85px;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.financial-bar-track {
+    height: 190px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.financial-bar {
+    display: block;
+    width: 55px;
+    min-height: 8px;
+    border-radius: 4px 4px 0 0;
+}
+
+/* First stock */
+.financial-bar-item:nth-child(1) .financial-bar {
+    background: #6686ed;
+}
+
+/* Second stock */
+.financial-bar-item:nth-child(2) .financial-bar {
+    background: #31527f;
+}
+
+/* Third stock */
+.financial-bar-item:nth-child(3) .financial-bar {
+    background: #8b5cf6;
+}
+
+
+/* BAR HEIGHT CLASSES */
+
+.bar-height-42 {
+    height: 42%;
+}
+
+.bar-height-45 {
+    height: 45%;
+}
+
+.bar-height-47 {
+    height: 47%;
+}
+
+.bar-height-48 {
+    height: 48%;
+}
+
+.bar-height-52 {
+    height: 52%;
+}
+
+.bar-height-55 {
+    height: 55%;
+}
+
+.bar-height-65 {
+    height: 65%;
+}
+
+.bar-height-67 {
+    height: 67%;
+}
+
+.bar-height-68 {
+    height: 68%;
+}
+
+.bar-height-70 {
+    height: 70%;
+}
+
+.bar-height-72 {
+    height: 72%;
+}
+
+.bar-height-85 {
+    height: 85%;
+}
+
+.bar-height-86 {
+    height: 86%;
+}
+
+.bar-height-88 {
+    height: 88%;
+}
+
+.bar-height-89 {
+    height: 89%;
+}
+
+/* ==================================================
+   COMPANY INFORMATION
+================================================== */
+
+.company-information-section {
+    margin-bottom: 30px;
+}
+
+.company-information-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.company-information-card {
+    display: flex;
+    min-height: 390px;
+    flex-direction: column;
+}
+
+.company-symbol-avatar {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 18px;
+    place-items: center;
+    color: #7c3aed;
+    background: #f1eaff;
+    border-radius: 12px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.company-information-card h3 {
+    margin: 0 0 8px;
+    color: #141d33;
+    font-size: 23px;
+    font-weight: 500;
+}
+
+.company-meta {
+    margin-bottom: 18px;
+    color: #697184;
+    font-size: 13px;
+}
+
+.company-description {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0 0 20px;
+    color: #4e5668;
+    font-size: 14px;
+    line-height: 1.75;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 8;
+    line-clamp: 8;
+}
+
+.company-information-card a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    color: #7c3aed;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media (max-width: 1100px) {
+
+    .comparison-top-grid,
+    .financial-chart-grid,
+    .company-information-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .comparison-page-heading h1 {
+        font-size: 35px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .comparison-results-page {
+        width: calc(100% - 30px);
+        padding-top: 25px;
+    }
+
+    .comparison-page-heading h1 {
+        font-size: 29px;
+    }
+
+    .comparison-panel {
+        padding: 20px;
+    }
+
+    .comparison-panel-heading {
+        align-items: flex-start;
+    }
+
+    .price-chart-row {
+        grid-template-columns: 105px 1fr;
+        gap: 10px;
+    }
+
+    .chart-period-buttons {
+        flex-wrap: wrap;
+    }
+
+    .financial-bars {
+        gap: 25px;
+    }
+}
+
+/* ==========================================
+   REAL HISTORICAL STOCK CHART
+========================================== */
+
+.historical-chart-container {
+
+    width: 100%;
+
+    height: 430px;
+
+    margin-top: 25px;
+
+    padding: 25px 20px 15px;
+
+    background: #ffffff;
+
+    border: 1px solid #e4e7ef;
+
+    border-radius: 14px;
+
+}
+
+
+.historical-chart-container canvas {
+
+    width: 100% !important;
+
+    height: 100% !important;
+
+}
+
+
+/* Chart period buttons */
+
+.chart-period-buttons button {
+
+    min-width: 48px;
+
+    padding: 9px 15px;
+
+    border: none;
+
+    border-radius: 25px;
+
+    background: transparent;
+
+    color: #667085;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+
+}
+
+
+.chart-period-buttons button:hover {
+
+    color: #7c3aed;
+
+    background: #f4efff;
+
+}
+
+
+.chart-period-buttons button.active {
+
+    color: #6f35f2;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 3px 12px rgba(50,
+            40,
+            100,
+            0.12);
+
+}
+
+
+/* Mobile responsive */
+
+@media (max-width: 768px) {
+
+    .comparison-panel-heading {
+
+        align-items:
+            flex-start;
+
+        gap: 20px;
+
+    }
+
+
+    .chart-period-buttons {
+
+        width: 100%;
+
+        overflow-x: auto;
+
+    }
+
+
+    .historical-chart-container {
+
+        height: 350px;
+
+        padding:
+            18px 10px 10px;
+
+    }
+
+}
+
+/* ==========================================
+   AI RECOMMENDATION CARD
+========================================== */
+/* 
+.ai-card {
+    background: #ffffff;
+    border: 1px solid #e2e6ef;
+    border-radius: 20px;
+    padding: 20px;
+    min-height: 360px;
+    box-shadow: 0 8px 25px rgba(20, 30, 60, 0.04);
+} */
+
+
+/* Header */
+
+.ai-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+}
+
+.ai-section-label {
+    display: block;
+    color: #7a8193;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.ai-card-header h4 {
+    color: #111827;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.ai-status-icon {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7c3aed;
+    background: #f1eafe;
+    border-radius: 13px;
+    font-size: 21px;
+}
+
+
+/* Signal and confidence */
+
+.ai-signal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.ai-small-label {
+    display: block;
+    color: #7a8193;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.ai-signal {
+    display: inline-block;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    padding: 6px 16px;
+    border-radius: 11px;
+    line-height: 1;
+}
+
+
+/* Dynamic signal colors */
+
+.buy-signal {
+    color: #059669;
+    background: #ecfdf5;
+}
+
+.hold-signal {
+    color: #d97706;
+    background: #fff7e6;
+}
+
+.sell-signal {
+    color: #dc2626;
+    background: #fef2f2;
+}
+
+
+/* Confidence circle */
+
+.confidence-circle {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg,
+            #f4efff,
+            #ffffff);
+    border: 5px solid #8b3dff;
+    border-radius: 50%;
+    box-shadow: 0 7px 18px rgba(124, 58, 237, 0.13);
+}
+
+.confidence-circle strong {
+    color: #111827;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.confidence-circle span {
+    color: #7a8193;
+    font-size: 10px;
+    margin-top: 6px;
+}
+
+
+/* Confidence progress */
+
+.confidence-progress {
+    margin-bottom: 22px;
+}
+
+.confidence-progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #667085;
+    font-size: 13px;
+    margin-bottom: 9px;
+}
+
+.confidence-progress-header strong {
+    color: #7c3aed;
+}
+
+.confidence-progress-track {
+    width: 100%;
+    height: 8px;
+    overflow: hidden;
+    background: #ebeef4;
+    border-radius: 20px;
+}
+
+.confidence-progress-fill {
+    height: 100%;
+    min-width: 4px;
+    background: linear-gradient(90deg,
+            #6c63ff,
+            #8b2cff);
+    border-radius: 20px;
+    transition: width 0.6s ease;
+}
+
+
+/* AI message */
+
+.ai-analysis-message {
+    font-size:13px;
+    line-height:1.5;
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    background: #f7f3ff;
+    border: 1px solid #eee5ff;
+    border-radius: 13px;
+    padding: 14px;
+    margin-bottom: 20px;
+}
+
+.ai-analysis-message i {
+    color: #7c3aed;
+    font-size: 18px;
+    margin-top: 1px;
+}
+
+.ai-analysis-message p {
+    color: #525b70;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+
+/* Analysis button */
+
+.ai-analysis-button {
+    width: 100%;
+    height:42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    color: #ffffff;
+    background: linear-gradient(90deg,
+            #6d5dfc,
+            #8b2cf5);
+    border: none;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.ai-analysis-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 20px rgba(124, 58, 237, 0.24);
+}
+
+
+/* Mobile responsive */
+
+@media (max-width: 768px) {
+
+    .ai-card {
+        padding: 22px;
+    }
+
+    .ai-card-header h4 {
+        font-size: 21px;
+    }
+
+    .confidence-circle {
+        width: 82px;
+        height: 82px;
+    }
+
+    .ai-signal {
+        font-size: 26px;
+    }
+
+}
+
+/* ==========================================
+   MARKET NEWS FONT SIZE FIX
+========================================== */
+
+.market-news-item {
+    text-decoration: none;
+    color: inherit;
+}
+
+.market-news-item h5 {
+    font-size: 14px;
+    line-height: 1.45;
+    font-weight: 600;
+    color: #7C3AED;
+    margin: 5px 0 0;
+}
+
+.news-source {
+    font-size: 11px;
+    color: #161617;
+}
+
+.news-date {
+    font-size: 11px;
+    color: #000000;
+}
+
+.news-icon {
+    font-size: 14px;
+}
+
+.news-link-icon {
+    font-size: 13px;
+}
+
+.news-section-label {
+    font-size: 12px;
+    display:block;
+    margin-bottom:2px;
+}
+
+.news-card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:10px;
+    padding-bottom:10px;
+
+    border-bottom:1px solid #f1f2f6;
+}
+
+.news-card-header h4 {
+    font-size: 20px;
+    border-bottom:1px solid #F0F1F6;
+    padding-bottom:15px;
+    margin-bottom:18px;
+    margin:0;
+    font-size:18px;
+
+
+}
+
+/* ==========================================
+   ANALYSIS HERO
+========================================== */
+.analysis-hero{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:35px 42px;
+
+    border-radius:28px;
+
+    background:linear-gradient(135deg,#5b4cf8,#9333ea);
+
+    color:white;
+
+    margin-bottom:35px;
+
+}
+
+.hero-left h1{
+
+    font-size:44px;
+    line-height:1.2;
+    font-weight:700;
+    margin:18px 0 12px;
+
+}
+
+.hero-label{
+
+    background:rgba(255,255,255,.18);
+
+    padding:10px 18px;
+
+    border-radius:30px;
+
+    font-size:15px;
+
+}
+
+.hero-symbol{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    font-size:18px;
+
+    opacity:.9;
+
+}
+
+.hero-right{
+
+    text-align:right;
+
+    min-width:340px;
+
+}
+
+.hero-price{
+
+    font-size:46px;
+
+    font-weight:700;
+
+    line-height:1;
+
+    margin-bottom:10px;
+
+}
+
+.hero-change{
+
+    font-size:18px;
+
+    font-weight:600;
+
+    margin-bottom:26px;
+
+}
+
+.hero-change.positive{
+
+    color:#86efac;
+
+}
+
+.hero-change.negative{
+
+    color:#fca5a5;
+
+}
+
+.hero-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:18px 35px;
+
+    margin-bottom:25px;
+
+}
+
+.hero-item{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.hero-item span{
+
+    font-size:13px;
+
+    opacity:.8;
+
+}
+
+.hero-item strong{
+
+    font-size:16px;
+
+    font-weight:600;
+
+}
+
+.hero-live{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    background:rgba(255,255,255,.15);
+
+    padding:8px 16px;
+
+    border-radius:30px;
+
+    font-size:14px;
+
+}
+/* ==========================================
+   ANALYSIS SCORE GRID
+========================================== */
+
+.analysis-score-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1.4fr 1fr 1fr 1fr;
+
+    gap: 22px;
+
+    margin-bottom: 30px;
+
+}
+
+.analysis-ai-card,
+.overall-score-card,
+.mini-score-card {
+
+    background: #fff;
+
+    border-radius: 18px;
+
+    padding: 24px;
+
+    box-shadow: 0 10px 25px rgba(20, 30, 60, .05);
+
+}
+
+.analysis-ai-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+
+    color: #6b7280;
+
+}
+
+.analysis-ai-card h2 {
+
+    font-size: 38px;
+
+    margin-bottom: 10px;
+
+}
+
+.analysis-ai-card p {
+
+    color: #6b7280;
+
+}
+
+.overall-score-card {
+
+    text-align: center;
+
+}
+
+.overall-score-circle {
+
+    width: 95px;
+
+    height: 95px;
+
+    margin: 18px auto;
+
+    border-radius: 50%;
+
+    background: linear-gradient(135deg,
+            #6d5dfc,
+            #8b2cf5);
+
+    color: #fff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 30px;
+
+    font-weight: 700;
+
+}
+
+.mini-score-card strong {
+
+    display: block;
+
+    margin: 10px 0;
+
+    font-size: 26px;
+
+}
+
+.mini-progress {
+
+    height: 8px;
+
+    background: #ececf4;
+
+    border-radius: 50px;
+
+}
+
+.mini-progress-fill {
+
+    height: 100%;
+
+    border-radius: 50px;
+
+    background: linear-gradient(90deg,
+            #6d5dfc,
+            #8b2cf5);
+
+}
+
+@media(max-width:1100px) {
+
+    .analysis-score-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+.recommendation-desc {
+
+    margin-top: 18px;
+
+    font-size: 14px;
+
+    color: #6b7280;
+
+    line-height: 1.6;
+
+}
+
+.confidence-progress {
+
+    margin-top: 18px;
+
+    height: 8px;
+
+    background: #ececf4;
+
+    border-radius: 30px;
+
+    overflow: hidden;
+
+}
+
+.confidence-fill {
+
+    height: 100%;
+
+    background: linear-gradient(90deg,
+            #6d5dfc,
+            #9333ea);
+
+}
+
+.analysis-update {
+
+    margin-top: 16px;
+
+    font-size: 13px;
+
+    color: #8b8b8b;
+
+}
+
+.score-description {
+
+    margin-top: 10px;
+
+    font-weight: 600;
+
+    color: #111827;
+
+}
+
+.score-footer {
+
+    margin-top: 8px;
+
+    font-size: 13px;
+
+    color: #7b7b7b;
+
+}
+.metric-info{
+
+    margin-top:14px;
+
+    color:#6b7280;
+
+    font-size:14px;
+
+}
+.info-card h5{
+
+display:flex;
+
+align-items:center;
+
+gap:8px;
+
+}
+
+.hero-right{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+}
+
+.hero-stats{
+
+    margin-top:18px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+    align-items:flex-end;
+
+}
+
+.hero-stat{
+
+    display:flex;
+
+    gap:14px;
+
+    align-items:center;
+
+}
+
+.hero-stat span{
+
+    opacity:.8;
+
+    font-size:15px;
+
+}
+
+.hero-stat strong{
+
+    font-size:18px;
+
+    font-weight:700;
+
+}
+
+.hero-change{
+
+    margin-top:12px;
+
+    font-size:18px;
+
+    font-weight:700;
+
+}
+
+.hero-change.positive{
+
+    color:#7CFF9E;
+
+}
+
+.hero-change.negative{
+
+    color:#FFB4B4;
+
+}
+/*==========================
+NEW AI CARD
+==========================*/
+
+/* .ai-card{
+
+    background:#fff;
+    border:1px solid #ececf4;
+    border-radius:22px;
+    padding:26px;
+    box-shadow:0 10px 35px rgba(15,23,42,.04);
+
+} */
+
+.ai-card-top{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:28px;
+
+}
+
+.ai-subtitle{
+
+    font-size:12px;
+    color:#7c3aed;
+    font-weight:600;
+
+}
+
+.ai-card h2{
+
+    margin-top:4px;
+    font-size:25px;
+    font-weight:600;
+
+}
+
+.ai-chip{
+
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    background:#f3ecff;
+    color:#7c3aed;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:22px;
+
+}
+
+.signal-row{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+}
+
+.signal-badge{
+
+    padding:12px 28px;
+    border-radius:14px;
+    font-size:30px;
+    font-weight:700;
+
+}
+
+.buy{
+
+    background:#dcfce7;
+    color:#15803d;
+
+}
+
+.sell{
+
+    background:#fee2e2;
+    color:#dc2626;
+
+}
+
+.hold{
+
+    background:#fff7e6;
+    color:#d97706;
+
+}
+
+.confidence-text{
+
+    text-align:right;
+    font-size:34px;
+    font-weight:700;
+
+}
+
+.confidence-text span{
+
+    display:block;
+    font-size:13px;
+    color:#6b7280;
+    font-weight:500;
+
+}
+
+.progress{
+
+    height:8px;
+    background:#ececf4;
+    border-radius:100px;
+    overflow:hidden;
+    margin:28px 0;
+
+}
+
+.progress-fill{
+
+    height:100%;
+    width:0;
+    background:linear-gradient(90deg,#6366f1,#9333ea);
+
+}
+
+.ai-reasons{
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+
+    font-size:15px;
+    color:#374151;
+
+}
+
+.ai-reasons i{
+
+    color:#7c3aed;
+    margin-right:10px;
+
+}
+
+.updated-time{
+
+    margin-top:22px;
+
+    color:#6b7280;
+
+    font-size:13px;
+
+}
+
+.analysis-btn{
+
+    margin-top:26px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+    height:52px;
+
+    border-radius:14px;
+
+    color:#fff;
+
+    font-weight:600;
+
+    background:linear-gradient(90deg,#6366f1,#9333ea);
+
+    transition:.3s;
+
+}
+
+.analysis-btn:hover{
+
+    transform:translateY(-2px);
+
+    color:#fff;
+
+}
+.market-news-list{
+    margin-top:8px;
+    max-height:540px;
+    overflow-y:auto;
+    padding-right:14px;
+}
+
+.market-news-list::-webkit-scrollbar{
+    width:6px;
+}
+
+.market-news-list::-webkit-scrollbar-thumb{
+    background:#b38cff;
+    border-radius:20px;
+}
+
+.market-news-list::-webkit-scrollbar-track{
+    background:transparent;
+}
+.recommendation-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.signal-badge{
+
+padding:8px 18px;
+
+border-radius:30px;
+
+font-weight:700;
+
+font-size:13px;
+
+color:white;
+
+}
+
+.signal-buy{
+
+background:#16a34a;
+
+}
+
+.signal-hold{
+
+background:#f59e0b;
+
+}
+
+.signal-sell{
+
+background:#ef4444;
+
+}
+
+.confidence-row{
+
+display:flex;
+
+justify-content:space-between;
+
+margin-bottom:12px;
+
+font-weight:600;
+
+}
+
+.ai-summary{
+
+background:#F8F5FF;
+
+padding:16px;
+
+border-left:4px solid #7C3AED;
+
+border-radius:14px;
+
+margin:20px 0;
+
+line-height:1.7;
+
+color:#444;
+
+}
+
+.analysis-section{
+
+margin-top:20px;
+
+}
+
+.analysis-section h5{
+
+font-size:17px;
+
+margin-bottom:10px;
+
+}
+
+.analysis-section ul{
+
+padding-left:18px;
+
+}
+
+.analysis-section li{
+
+margin-bottom:8px;
+
+line-height:1.6;
+
+}
+
+.target-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+    margin-top:auto;
+}
+
+.target-box{
+
+background:#F8F8FC;
+
+padding:15px;
+
+border-radius:14px;
+
+text-align:center;
+
+border:1px solid #ECECEC;
+
+}
+
+.target-box small{
+
+display:block;
+
+margin-bottom:6px;
+
+color:#777;
+
+}
+
+.target-box strong{
+
+font-size:18px;
+
+color:#6D28D9;
+
+}
+.analysis-grid-two{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+    margin-top:20px;
+}
+
+.analysis-section{
+
+margin:0;
+
+}
+
+.analysis-section h5{
+
+margin-bottom:12px;
+
+font-size:17px;
+
+font-weight:700;
+
+}
+
+.analysis-section ul{
+
+padding-left:18px;
+    font-weight:600;
+
+    background:linear-gradient(90deg,#6366f1,#9333ea);
+
+    transition:.3s;
+
+}
+
+.analysis-btn:hover{
+
+    transform:translateY(-2px);
+
+    color:#fff;
+
+}
+.market-news-list{
+    margin-top:8px;
+    max-height:540px;
+    overflow-y:auto;
+    padding-right:14px;
+}
+
+.market-news-list::-webkit-scrollbar{
+    width:6px;
+}
+
+.market-news-list::-webkit-scrollbar-thumb{
+    background:#b38cff;
+    border-radius:20px;
+}
+
+.market-news-list::-webkit-scrollbar-track{
+    background:transparent;
+}
+.recommendation-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.signal-badge{
+
+padding:8px 18px;
+
+border-radius:30px;
+
+font-weight:700;
+
+font-size:13px;
+
+color:white;
+
+}
+
+.signal-buy{
+
+background:#16a34a;
+
+}
+
+.signal-hold{
+
+background:#f59e0b;
+
+}
+
+.signal-sell{
+
+background:#ef4444;
+
+}
+
+.confidence-row{
+
+display:flex;
+
+justify-content:space-between;
+
+margin-bottom:12px;
+
+font-weight:600;
+
+}
+
+.ai-summary{
+
+background:#F8F5FF;
+
+padding:16px;
+
+border-left:4px solid #7C3AED;
+
+border-radius:14px;
+
+margin:20px 0;
+
+line-height:1.7;
+
+color:#444;
+
+}
+
+.analysis-section{
+
+margin-top:20px;
+
+}
+
+.analysis-section h5{
+
+font-size:17px;
+
+margin-bottom:10px;
+
+}
+
+.analysis-section ul{
+
+padding-left:18px;
+
+}
+
+.analysis-section li{
+
+margin-bottom:8px;
+
+line-height:1.6;
+
+}
+
+.target-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+    margin-top:auto;
+}
+
+.target-box{
+
+background:#F8F8FC;
+
+padding:15px;
+
+border-radius:14px;
+
+text-align:center;
+
+border:1px solid #ECECEC;
+
+}
+
+.target-box small{
+
+display:block;
+
+margin-bottom:6px;
+
+color:#777;
+
+}
+
+.target-box strong{
+
+font-size:18px;
+
+color:#6D28D9;
+
+}
+.analysis-grid-two{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+    margin-top:20px;
+}
+
+.analysis-section{
+
+margin:0;
+
+}
+
+.analysis-section h5{
+
+margin-bottom:12px;
+
+font-size:17px;
+
+font-weight:700;
+
+}
+
+.analysis-section ul{
+
+padding-left:18px;
+
+margin:0;
+
+}
+
+.analysis-section li{
+
+margin-bottom:10px;
+
+line-height:1.5;
+
+font-size:15px;
+
+}
+
+.add-stock-box {
+    min-height: 130px;
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: var(--compare-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 16px;
+    transition: all 0.18s ease;
+    text-align: center;
+}
+
+.add-stock-box:hover {
+    background: var(--compare-primary-light);
+    border-color: var(--compare-primary);
+}
+
+.add-stock-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ffffff;
+    color: var(--compare-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.add-stock-box span {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--compare-text-secondary);
+}
+
+.add-stock-box.selected {
+    background: #ffffff;
+    border: 1px solid var(--compare-primary);
+    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.08);
+    position: relative;
+}
+
+.selected-stock-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.selected-stock-details h4 {
+    margin: 0 0 2px;
+    font-size: 14px;
+    font-weight: 650;
+    color: var(--compare-text);
+}
+
+.selected-stock-details p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--compare-primary);
+    font-weight: 600;
+}
+
+.remove-selected-stock {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: var(--compare-danger);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.remove-selected-stock:hover {
+    transform: scale(1.1);
+}
+
+.compare-button-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0 36px;
+}
+
+.compare-stocks-button {
+    padding: 12px 36px;
+    background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.28);
+    transition: all 0.18s ease;
+}
+
+.compare-stocks-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+}
+
+.compare-stocks-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Popular Comparisons */
+.popular-heading {
+    margin-bottom: 16px;
+}
+
+.small-section-title {
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--compare-primary);
+    letter-spacing: 0.05em;
+}
+
+.popular-heading h2 {
+    margin: 2px 0 4px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--compare-text);
+}
+
+.popular-heading p {
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--compare-text-secondary);
+}
+
+.popular-comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.popular-comparison-card {
+    background: var(--compare-surface);
+    border: 1px solid var(--compare-border);
+    border-radius: var(--compare-radius-sm);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s ease;
+}
+
+.popular-comparison-card:hover {
+    border-color: var(--compare-primary-border);
+    background: var(--compare-primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--compare-shadow);
+}
+
+.popular-company {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.company-logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.popular-company h4 {
+    margin: 0;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--compare-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90px;
+}
+
+.popular-company span {
+    font-size: 11px;
+    color: var(--compare-primary);
+    font-weight: 500;
+}
+
+.versus-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: var(--compare-text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   INTERACTIVE STOCK SEARCH MODAL
+   ========================================================================== */
+
+.compare-stock-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.compare-stock-modal.show {
+    display: flex;
+}
+
+.compare-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.compare-modal-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 540px;
+    max-height: 80vh;
+    background: #ffffff;
+    border: 1px solid var(--compare-border);
+    border-radius: var(--compare-radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+    animation: modalScaleIn 0.2s ease both;
+}
+
+@keyframes modalScaleIn {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.compare-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--compare-border);
+}
+
+.compare-modal-header h2 {
+    margin: 0 0 3px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--compare-text);
+}
+
+.compare-modal-header p {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--compare-text-secondary);
+}
+
+.close-compare-modal {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    border: none;
+    color: var(--compare-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s ease;
+}
+
+.close-compare-modal:hover {
+    background: #fee2e2;
+    color: var(--compare-danger);
+}
+
+.compare-search-wrapper {
+    position: relative;
+    margin: 14px 20px 8px;
+}
+
+.compare-search-wrapper i {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    color: var(--compare-text-muted);
+    font-size: 15px;
+}
+
+.compare-search-wrapper input {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px 0 40px;
+    background: #f8fafc;
+    border: 1px solid var(--compare-border);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 13.5px;
+    color: var(--compare-text);
+    outline: none;
+    transition: all 0.15s ease;
+}
+
+.compare-search-wrapper input:focus {
+    background: #ffffff;
+    border-color: var(--compare-primary);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.compare-search-status {
+    padding: 0 20px 8px;
+    font-size: 12px;
+    color: var(--compare-text-muted);
+}
+
+.compare-search-results {
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 0 12px 14px;
+}
+
+.compare-search-item {
+    width: 100%;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--compare-border-subtle);
+    border-radius: 8px;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.compare-search-item:hover {
+    background: var(--compare-primary-light);
+}
+
+.search-stock-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--compare-primary-light);
+    color: var(--compare-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.search-stock-information {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-stock-information h4 {
+    margin: 0 0 2px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--compare-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-stock-information p {
+    margin: 0;
+    font-size: 11.5px;
+    color: var(--compare-text-muted);
+}
+
+.compare-search-item > i {
+    color: var(--compare-primary);
+    font-size: 16px;
+}
+
+body.compare-modal-open {
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS (ALL RESOLUTIONS)
+   ========================================================================== */
+
+/* Laptops & 1080p Viewports (1240px - 1440px) */
+@media (max-width: 1440px) {
+    .compare-page,
+    .comparison-results-page {
+        padding: 20px 20px 50px;
+    }
+}
+
+/* Small Laptops & Tablets Landscape (1024px - 1239px) */
+@media (max-width: 1239px) {
+    .header-titles h1 {
+        font-size: 24px;
+    }
+
+    .charts-comparison-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .popular-comparison-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Tablets Portrait (768px - 1023px) */
+@media (max-width: 1023px) {
+    .header-main-content {
+        flex-direction: column;
+    }
+
+    .comparison-controls-card {
+        width: 100%;
+    }
+
+    .summary-cards-grid.grid-cols-3,
+    .company-profiles-grid.grid-cols-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .fundamentals-2col-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .table-scroll-hint {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+}
+
+/* Mobile Screens (< 768px) */
+@media (max-width: 767px) {
+    .compare-page,
+    .comparison-results-page {
+        padding: 16px 14px 40px;
+    }
+
+    .header-titles h1 {
+        font-size: 22px;
+    }
+
+    .summary-cards-grid.grid-cols-2,
+    .summary-cards-grid.grid-cols-3,
+    .company-profiles-grid.grid-cols-2,
+    .company-profiles-grid.grid-cols-3,
+    .stock-selection-grid,
+    .popular-comparison-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .compare-card-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sector-filter {
+        width: 100%;
+    }
+
+    .historical-chart-container {
+        height: 240px;
+    }
+
+    .chart-period-buttons button {
+        padding: 3px 7px;
+        font-size: 11px;
+    }
+}

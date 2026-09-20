@@ -1,0 +1,915 @@
+/* ==========================================================================
+   InvestIQ Stock Analysis Dashboard - Clean Modern UI
+   ========================================================================== */
+
+.analysis-page {
+    width: min(1440px, 100%);
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Section Headings
+   ========================================================================== */
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.section-heading span {
+    display: block;
+    color: #7c3aed;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+}
+
+.section-heading h4 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.section-heading i {
+    font-size: 20px;
+    color: #8b5cf6;
+    background: #f5f3ff;
+    padding: 8px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+}
+
+/* ==========================================================================
+   1. Hero Section
+   ========================================================================== */
+
+.analysis-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 32px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 28px 32px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+
+.hero-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hero-tag-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.hero-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #f5f3ff;
+    color: #6d28d9;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.hero-exchange-badge {
+    padding: 4px 10px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.hero-company-name {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.25;
+}
+
+.hero-symbol-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.hero-symbol, .hero-sector {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.hero-right {
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 14px;
+}
+
+.hero-price-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.hero-price {
+    font-size: 38px;
+    font-weight: 800;
+    color: #0f172a;
+    font-family: var(--font-number, "IBM Plex Mono", monospace);
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+.hero-change {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 8px;
+}
+
+.hero-change.positive {
+    color: #15803d;
+    background: #f0fdf4;
+}
+
+.hero-change.negative {
+    color: #b91c1c;
+    background: #fef2f2;
+}
+
+.hero-change.neutral {
+    color: #475569;
+    background: #f1f5f9;
+}
+
+.hero-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.hero-item {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 10px 12px;
+    text-align: center;
+}
+
+.hero-item-label {
+    display: block;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.hero-item-val {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    font-family: var(--font-number, "IBM Plex Mono", monospace);
+}
+
+.hero-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #16a34a;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+    animation: livePulse 1.8s infinite;
+}
+
+@keyframes livePulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.5; }
+}
+
+/* ==========================================================================
+   2. 7-Factor Signal & Composite Score (Top Row)
+   ========================================================================== */
+
+.signal-score-row {
+    display: grid;
+    grid-template-columns: minmax(320px, 1.2fr) minmax(380px, 1.8fr);
+    gap: 20px;
+}
+
+.signal-card, .overall-score-card, .mini-score-card, .chart-card, .company-snapshot-card, .technicals-panel, .fundamentals-card, .latest-news-card, .ai-analysis-panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+}
+
+.signal-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.signal-value-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.signal-value {
+    font-size: 26px;
+    font-weight: 800;
+    padding: 6px 16px;
+    border-radius: 12px;
+    letter-spacing: 0.02em;
+}
+
+.buy-signal {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+}
+
+.hold-signal {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fde68a;
+}
+
+.sell-signal {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.signal-confidence-badge {
+    text-align: right;
+}
+
+.signal-confidence-badge span {
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.signal-confidence-badge b {
+    font-size: 16px;
+    color: #0f172a;
+    font-family: var(--font-number, "IBM Plex Mono", monospace);
+}
+
+.signal-summary {
+    color: #475569;
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin: 0 0 16px;
+}
+
+.confidence-progress {
+    width: 100%;
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 18px;
+}
+
+.confidence-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7c3aed, #a855f7);
+    border-radius: 99px;
+    transition: width 1s ease;
+}
+
+.signal-targets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: auto;
+}
+
+.target-chip {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+
+.target-chip span {
+    display: block;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.target-chip strong {
+    font-size: 14px;
+    color: #0f172a;
+    font-family: var(--font-number, "IBM Plex Mono", monospace);
+}
+
+/* Score Side Breakdown */
+.score-side {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 16px;
+}
+
+.overall-score-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.score-heading-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.overall-score-circle {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 800;
+    margin: 12px 0;
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.25);
+    font-family: var(--font-number, "IBM Plex Mono", monospace);
+}
+
+.overall-grade-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+}
+
+.grade-strong { background: #ecfdf5; color: #059669; }
+.grade-buy { background: #f5f3ff; color: #6d28d9; }
+.grade-hold { background: #fffbeb; color: #d97706; }
+.grade-caution { background: #fef2f2; color: #dc2626; }
+
+.score-description {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.mini-score-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.mini-score-card {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+}
+
+.mini-score-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mini-score-header span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.mini-score-header strong {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    font-family: var(--font-number, "IBM Plex Mono", monospace);
+}
+
+.mini-progress {
+    width: 100%;
+    height: 6px;
+    background: #f1f5f9;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.mini-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #059669);
+    border-radius: 99px;
+}
+
+/* ==========================================================================
+   3. Performance & Valuation Metrics Row
+   ========================================================================== */
+
+.performance-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(280px, 0.8fr);
+    gap: 20px;
+}
+
+.chart-card {
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-legend-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    background: #f8fafc;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.legend-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #7c3aed;
+}
+
+.chart-embed-wrapper {
+    flex: 1;
+    min-height: 340px;
+    position: relative;
+    width: 100%;
+}
+
+.company-snapshot-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.snapshot-metrics-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.snapshot-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+}
+
+.snap-label {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.snap-val {
+    color: #0f172a;
+    font-size: 14.5px;
+    font-weight: 700;
+    font-family: var(--font-number, "IBM Plex Mono", monospace);
+}
+
+.company-website-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: #f5f3ff;
+    color: #6d28d9;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.company-website-btn:hover {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+/* ==========================================================================
+   4. Technical Indicator Levels & Pivots Grid
+   ========================================================================== */
+
+.technicals-section {
+    width: 100%;
+}
+
+.technicals-panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+}
+
+.tech-levels-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-top: 6px;
+}
+
+.tech-level-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tech-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.tech-val {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    font-family: var(--font-number, "IBM Plex Mono", monospace);
+}
+
+.tech-level-card.support-card {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+.tech-level-card.support-card .tech-val {
+    color: #15803d;
+}
+
+.tech-level-card.resistance-card {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+.tech-level-card.resistance-card .tech-val {
+    color: #b91c1c;
+}
+
+/* ==========================================================================
+   5. Fundamentals Profile & Latest News Row
+   ========================================================================== */
+
+.fundamentals-news-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr);
+    gap: 20px;
+    align-items: stretch;
+}
+
+.fundamentals-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-data-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.profile-data-item {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.p-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.p-val {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #0f172a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.latest-news-card {
+    display: flex;
+    flex-direction: column;
+    max-height: 480px;
+}
+
+.news-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.news-scroll::-webkit-scrollbar {
+    width: 5px;
+}
+.news-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.news-item {
+    padding: 12px 14px;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.news-item:hover {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+}
+
+.news-item-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #0f172a;
+    line-height: 1.45;
+    margin: 0 0 8px;
+}
+
+.news-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 11.5px;
+}
+
+.news-source {
+    color: #64748b;
+}
+
+.read-more-link {
+    color: #7c3aed;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.read-more-link:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   6. AI Strengths, Risks & Outlook Panel
+   ========================================================================== */
+
+.ai-analysis-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.analysis-grid-two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.analysis-section {
+    border-radius: 14px;
+    padding: 18px 20px;
+}
+
+.analysis-section.strengths {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+
+.analysis-section.strengths h5 {
+    color: #15803d;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+
+.analysis-section.risks {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+.analysis-section.risks h5 {
+    color: #b91c1c;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+
+.analysis-section ul {
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.analysis-section li {
+    font-size: 13.5px;
+    color: #334155;
+    line-height: 1.5;
+}
+
+.target-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.target-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+}
+
+.target-box small {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.target-box strong {
+    font-size: 18px;
+    color: #0f172a;
+    font-family: var(--font-number, "IBM Plex Mono", monospace);
+}
+
+/* ==========================================================================
+   7. Empty Search State
+   ========================================================================== */
+
+.empty-state {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 80px 24px;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 56px;
+    color: #8b5cf6;
+    margin-bottom: 16px;
+    display: block;
+}
+
+.empty-state h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: #64748b;
+    font-size: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+    .signal-score-row {
+        grid-template-columns: 1fr;
+    }
+    .score-side {
+        grid-template-columns: 1fr;
+    }
+    .performance-row, .fundamentals-news-row {
+        grid-template-columns: 1fr;
+    }
+    .tech-levels-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .analysis-hero {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .hero-right {
+        align-items: flex-start;
+        min-width: 100%;
+    }
+    .hero-price-header {
+        align-items: flex-start;
+    }
+    .analysis-grid-two {
+        grid-template-columns: 1fr;
+    }
+    .profile-data-grid {
+        grid-template-columns: 1fr;
+    }
+    .target-grid {
+        grid-template-columns: 1fr;
+    }
+    .mini-score-grid {
+        grid-template-columns: 1fr;
+    }
+    .tech-levels-grid {
+        grid-template-columns: 1fr;
+    }
+}

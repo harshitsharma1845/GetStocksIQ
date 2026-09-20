@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block auth %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+
+<div class="auth-split-page auth-login-page">
+    <div class="auth-split-card">
+        <section class="auth-split-form">
+            <a href="/" class="auth-mini-brand">
+                <span></span>
+                GetStockIQ
+            </a>
+
+            <div class="auth-copy">
+                <h1>Welcome Back</h1>
+                <p>Intelligent Multi-Factor Market Strategist</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} mb-3">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('login') }}" method="POST" class="split-auth-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label class="auth-field">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" name="email" class="form-control" placeholder="Email Address" required>
+                </label>
+                <label class="auth-field">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                </label>
+
+                <div class="split-form-options">
+                    <label>
+                        <input type="checkbox">
+                        Remember me
+                    </label>
+                    <a href="{{ url_for('forgot_password', restart='1') }}">Forgot Password?</a>
+                </div>
+
+                <button class="btn btn-login">Sign In</button>
+            </form>
+
+            {% if google_client_id %}
+            <div class="google-login-divider"><span>or continue with</span></div>
+            <div class="google-signin-area">
+                <div id="googleSignInButton" aria-label="Sign in with Google"></div>
+                <p class="google-signin-error" id="googleSignInError" role="alert" hidden></p>
+            </div>
+            {% else %}
+            <p class="google-signin-unavailable">Google sign-in is currently unavailable.</p>
+            {% endif %}
+
+            <p class="split-auth-bottom">
+                Don't have an account?
+                <a href="/register">Sign Up</a>
+            </p>
+        </section>
+
+        <section class="auth-visual-panel">
+            <div class="market-visual">
+                <div class="visual-ribbon ribbon-a"></div>
+                <div class="visual-ribbon ribbon-b"></div>
+                <div class="visual-cloud cloud-a"></div>
+                <div class="visual-cloud cloud-b"></div>
+
+                <div class="chart-board">
+                    <span>Portfolio Growth</span>
+                    <div class="bar-set">
+                        <i style="height: 34%"></i>
+                        <i style="height: 58%"></i>
+                        <i style="height: 48%"></i>
+                        <i style="height: 76%"></i>
+                        <i style="height: 88%"></i>
+                    </div>
+                </div>
+
+                <div class="trend-card">
+                    <span>NIFTY Trend</span>
+                    <svg viewBox="0 0 260 110" preserveAspectRatio="none">
+                        <path d="M5 88 C40 75, 55 40, 92 56 S145 98, 184 42 S225 28, 255 18" />
+                    </svg>
+                </div>
+
+                <div class="market-stat-card">
+                    <small>Live Strategy</small>
+                    <strong>+18.42%</strong>
+                    <span>Projected return</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+{% if google_client_id %}
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+    (function () {
+        const clientId = {{ google_client_id | tojson }};
+        const csrfToken = {{ google_csrf_token | tojson }};
+        const buttonTarget = document.getElementById("googleSignInButton");
+        const errorTarget = document.getElementById("googleSignInError");
+
+        function showError(message) {
+            errorTarget.textContent = message;
+            errorTarget.hidden = false;
+        }
+
+        window.handleGoogleCredential = async function (response) {
+            errorTarget.hidden = true;
+            if (!response || !response.credential) {
+                showError("Google did not return a sign-in credential. Please try again.");
+                return;
+            }
+
+            try {
+                const result = await fetch("{{ url_for('google_login') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    credentials: "same-origin",
+                    body: JSON.stringify({ credential: response.credential, csrf_token: csrfToken })
+                });
+                const data = await result.json();
+                if (!result.ok || !data.success) {
+                    throw new Error(data.message || "Unable to sign in with Google.");
+                }
+                window.location.assign(data.redirect || "{{ url_for('dashboard') }}");
+            } catch (error) {
+                showError(error.message || "Unable to sign in with Google. Please try again.");
+            }
+        };
+
+        function renderGoogleButton() {
+            if (!window.google || !window.google.accounts || !buttonTarget) return;
+            window.google.accounts.id.initialize({
+                client_id: clientId,
+                callback: window.handleGoogleCredential,
+                auto_select: false,
+                cancel_on_tap_outside: true
+            });
+            window.google.accounts.id.renderButton(buttonTarget, {
+                theme: "outline",
+                size: "large",
+                text: "signin_with",
+                shape: "rectangular",
+                width: 400,
+                logo_alignment: "left"
+            });
+        }
+
+        window.addEventListener("load", renderGoogleButton);
+    }());
+</script>
+{% endif %}
+
+{% endblock %}

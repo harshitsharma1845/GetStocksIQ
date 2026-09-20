@@ -1,0 +1,535 @@
+{% extends "base.html" %}
+
+{% block title %}My Watchlist{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/watchlist.css') }}">
+{% endblock %}
+
+{% block content %}
+
+
+
+<!-- Header -->
+<div class="watchlist-page">
+
+    <!-- Hero -->
+    <div class="watchlist-hero">
+
+        <div class="hero-left">
+            <div class="live-badge">
+                <span class="live-dot"></span>
+                Live Market
+            </div>
+
+            <h1>My Watchlist</h1>
+
+            <p>
+                Track, monitor and analyse your favourite stocks with AI-powered insights.
+            </p>
+        </div>
+        <div class="hero-right">
+
+            <div class="market-widget">
+
+                <div class="market-header">
+
+                    <span class="market-dot"></span>
+
+                    Live Market
+
+                </div>
+
+                <div class="market-row">
+
+                    <div>
+
+                        <small>NIFTY 50</small>
+
+                        <h5 id="niftyValue">Loading...</h5>
+
+                    </div>
+
+                    <span class="positive" id="niftyChange">
+
+                        --
+
+                    </span>
+
+                </div>
+
+                <div class="market-row">
+
+                    <div>
+
+                        <small>SENSEX</small>
+
+                        <h5 id="sensexValue">Loading...</h5>
+
+                    </div>
+
+                    <span class="positive" id="sensexChange">
+
+                        --
+
+                    </span>
+
+                </div>
+
+                <button class="btn btn-primary watchlist-add-btn w-100 mt-3" data-bs-toggle="modal"
+                    data-bs-target="#addStockModal">
+
+                    <i class="bi bi-plus-lg"></i>
+
+                    Add Stock
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Statistics -->
+
+    <div class="watchlist-stats">
+
+        <div class="stat-card">
+
+            <div class="stat-icon blue">
+                <i class="bi bi-bookmark-star"></i>
+            </div>
+
+            <div>
+
+                <h3>{{ stocks|length }}</h3>
+
+                <span>Total Stocks</span>
+
+            </div>
+
+        </div>
+
+        <div class="stat-card">
+
+            <div class="stat-icon green">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+
+            <div>
+
+                <h3 id="gainersCount">--</h3>
+
+                <span>Today's Gainers</span>
+
+            </div>
+
+        </div>
+
+        <div class="stat-card">
+
+            <div class="stat-icon red">
+                <i class="bi bi-graph-down-arrow"></i>
+            </div>
+
+            <div>
+
+                <h3 id="losersCount">--</h3>
+
+                <span>Today's Losers</span>
+
+            </div>
+
+        </div>
+
+        <div class="stat-card">
+
+            <div class="stat-icon purple">
+                <i class="bi bi-wallet2"></i>
+            </div>
+
+            <div>
+
+                <h3>₹ --</h3>
+
+                <span>Portfolio Value</span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-row">
+
+        <div class="chart-card">
+
+            <div class="card-header">
+
+                <h4>Portfolio Allocation</h4>
+
+                <span>{{ stocks|length }} Holdings</span>
+
+            </div>
+
+            <div class="allocation-grid">
+
+                <div class="allocation-chart">
+
+                    <canvas id="allocationChart"></canvas>
+
+                </div>
+
+                <div class="allocation-right">
+
+                    <div id="portfolioLegend"></div>
+
+                    <div class="portfolio-summary">
+
+                        <div class="summary-card">
+                            <small>Total Holdings</small>
+                            <strong id="summaryHoldings">--</strong>
+                        </div>
+
+                        <div class="summary-card">
+                            <small>Today's Gainers</small>
+                            <strong id="summaryGainers">--</strong>
+                        </div>
+
+                        <div class="summary-card">
+                            <small>Today's Losers</small>
+                            <strong id="summaryLosers">--</strong>
+                        </div>
+
+                        <div class="summary-card">
+                            <small>Average Return</small>
+                            <strong id="summaryReturn">--</strong>
+                        </div>
+
+                    </div>
+
+
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- Toolbar -->
+
+<div class="watchlist-toolbar">
+
+    <div class="toolbar-search">
+
+        <i class="bi bi-search"></i>
+
+        <input type="text" id="watchlistSearch" placeholder="Search stocks...">
+
+    </div>
+
+    <div class="toolbar-actions">
+
+        <select class="form-select" id="watchlistSort" aria-label="Sort watchlist">
+
+            <option>Sort By</option>
+
+            <option>A → Z</option>
+
+            <option>Z → A</option>
+
+            <option>Price</option>
+
+        </select>
+
+        <select class="form-select" id="watchlistFilter" aria-label="Filter watchlist">
+
+            <option>All Stocks</option>
+
+            <option>Gainers</option>
+
+            <option>Losers</option>
+
+        </select>
+
+    </div>
+
+</div>
+
+<!-- Existing watchlist grid starts here -->
+
+<div class="watchlist-grid" id="watchlistGrid">
+    <!-- Cards -->
+
+
+
+    {% if stocks %}
+
+    {% for stock in stocks %}
+    <div class="watchlist-card" data-symbol="{{ stock.symbol }}">
+
+        <div class="card-top">
+
+            <div class="stock-info">
+
+                <div class="stock-avatar">
+
+                    {{ stock.symbol[0] }}
+
+                </div>
+
+                <div>
+
+                    <h4 class="stock-symbol">
+
+                        {{ stock.symbol }}
+
+                    </h4>
+
+                    <span class="company-name" id="company-{{ stock.symbol }}">
+
+                        Loading company...
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="signal-badge hold" id="signal-{{ stock.symbol }}">
+
+                HOLD
+
+            </div>
+
+        </div>
+
+
+        <div class="price-section">
+
+            <div class="stock-tags">
+
+                <span class="sector-tag sector-value" id="sector-{{ stock.symbol }}">
+
+                    <i class="bi bi-building"></i>
+
+                    {{ stock.sector if stock.sector else "Technology" }}
+
+                </span>
+
+                <span class="confidence-score">
+                    <i class="bi bi-cpu"></i>
+
+                    AI {{ (75 + range(0, 21) | random) }}%
+
+                </span>
+
+
+            </div>
+
+            <h2 class="stock-price" id="price-{{ stock.symbol }}">
+
+                ₹ --
+
+            </h2>
+
+            <span class="stock-change" id="change-{{ stock.symbol }}">
+
+                Loading...
+
+            </span>
+
+        </div>
+
+
+        <div class="mini-chart">
+
+            <div class="chart-placeholder">
+
+                <svg viewBox="0 0 220 70" preserveAspectRatio="none">
+
+                    <polyline fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round"
+                        stroke-linejoin="round" points="0,55
+                    25,48
+                    45,50
+                    70,34
+                    95,38
+                    120,24
+                    150,18
+                    180,26
+                    220,10" />
+
+                </svg>
+
+            </div>
+
+        </div>
+
+
+        <div class="stock-meta-grid">
+
+            <div>
+
+                <small>Market Cap</small>
+
+                <strong id="marketcap-{{ stock.symbol }}">
+
+                    --
+
+                </strong>
+
+            </div>
+
+            <div>
+
+                <small>P/E Ratio</small>
+
+                <strong id="pe-{{ stock.symbol }}">
+
+                    --
+
+                </strong>
+
+            </div>
+
+            <div>
+
+                <small>52W High</small>
+
+                <strong id="high-{{ stock.symbol }}">
+
+                    --
+
+                </strong>
+
+            </div>
+
+            <div>
+
+                <small>52W Low</small>
+
+                <strong id="low-{{ stock.symbol }}">
+
+                    --
+
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+
+        <div class="card-actions">
+
+            <a href="{{ url_for('analysis') }}?symbol={{ stock.symbol }}" class="btn analyse-btn">
+
+                <i class="bi bi-bar-chart"></i>
+
+                Analyse
+
+            </a>
+
+            <button class="btn compare-btn">
+
+                <i class="bi bi-arrow-left-right"></i>
+
+            </button>
+
+            <button class="btn remove-btn remove-stock" data-symbol="{{ stock.symbol }}">
+
+                <i class="bi bi-trash"></i>
+
+            </button>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+    {% else %}
+
+    <div class="watchlist-empty">
+
+        <i class="bi bi-stars"></i>
+
+        <h3>No Stocks Yet</h3>
+
+        <p>
+
+            Add your favourite stocks to build your watchlist.
+
+        </p>
+
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockModal">
+
+            Add First Stock
+
+        </button>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+</div>
+
+<!-- Modal -->
+
+<div class="modal fade" id="addStockModal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header add-stock-modal-header">
+                <div>
+                    <span class="add-stock-eyebrow"><i class="bi bi-plus-circle"></i> Watchlist</span>
+                    <h5 class="modal-title">Add a stock</h5>
+                    <p>Search NSE stocks and add them to your live watchlist.</p>
+                </div>
+
+                <button class="btn-close" data-bs-dismiss="modal">
+
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="search-wrapper add-stock-search">
+                    <i class="bi bi-search"></i>
+                    <input class="form-control" id="stockSearchInput" placeholder="Search by company or symbol, e.g. TCS">
+                    <span class="search-shortcut">NSE</span>
+                </div>
+                <p class="add-stock-hint" id="addStockHint">Start typing to find a stock.</p>
+
+                <div id="stockResults" class="stock-results">
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/watchlist.js') }}"></script>
+{% endblock %}

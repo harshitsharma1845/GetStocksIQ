@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
+{% block title %}
+{% if active_panel == "settings" %}Settings{% else %}My Profile{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="profile-page">
+
+    <div class="profile-hero">
+        <div class="profile-avatar-large">
+            {{ current_user.full_name[0]|upper }}
+        </div>
+
+        <div>
+            <span class="profile-kicker">Investor Account</span>
+            <h1>{{ current_user.full_name }}</h1>
+            <p>{{ current_user.email }}</p>
+        </div>
+    </div>
+
+    <div class="profile-layout">
+
+        <aside class="profile-sidebar">
+            <a href="{{ url_for('profile') }}" class="{% if active_panel == 'profile' %}active{% endif %}">
+                <i class="bi bi-person"></i>
+                My Profile
+            </a>
+
+            <a href="{{ url_for('settings') }}" class="{% if active_panel == 'settings' %}active{% endif %}">
+                <i class="bi bi-gear"></i>
+                Settings
+            </a>
+        </aside>
+
+        <section class="profile-panel">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="profile-flashes">
+                {% for category, message in messages %}
+                <div class="profile-flash {{ category }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            {% if active_panel == "settings" %}
+
+            <div class="panel-heading">
+                <span>Preferences</span>
+                <h2>Settings</h2>
+            </div>
+
+            <div class="settings-list">
+                <label class="setting-row">
+                    <div>
+                        <strong>Glass effects</strong>
+                        <span>Keep the soft transparent dashboard style enabled.</span>
+                    </div>
+                    <input type="checkbox" class="settings-toggle" data-setting="glassEffects" checked>
+                </label>
+
+                <label class="setting-row">
+                    <div>
+                        <strong>Market animations</strong>
+                        <span>Use smooth transitions on cards and live chart controls.</span>
+                    </div>
+                    <input type="checkbox" class="settings-toggle" data-setting="marketAnimations" checked>
+                </label>
+
+                <label class="setting-row">
+                    <div>
+                        <strong>Compact numbers</strong>
+                        <span>Show portfolio and market values in a tighter format.</span>
+                    </div>
+                    <input type="checkbox" class="settings-toggle" data-setting="compactNumbers">
+                </label>
+            </div>
+
+            {% else %}
+
+            <div class="panel-heading">
+                <span>Account Details</span>
+                <h2>My Profile</h2>
+            </div>
+
+            <form method="POST" action="{{ url_for('profile') }}" class="profile-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label>
+                    Full name
+                    <input type="text" name="full_name" value="{{ current_user.full_name }}" required>
+                </label>
+
+                <label>
+                    Email address
+                    <input type="email" name="email" value="{{ current_user.email }}" required>
+                </label>
+
+                <label>
+                    Phone number
+                    <input type="text" name="phone" value="{{ current_user.phone or '' }}" placeholder="+91">
+                </label>
+
+                <label>
+                    Investment goal
+                    <input type="text" name="investment_goal" value="{{ current_user.investment_goal or '' }}" placeholder="Long-term wealth, retirement, short-term trading">
+                </label>
+
+                <div class="profile-form-grid">
+                    <label>
+                        Risk profile
+                        <select name="risk_profile">
+                            <option value="Conservative" {% if current_user.risk_profile == 'Conservative' %}selected{% endif %}>Conservative</option>
+                            <option value="Moderate" {% if current_user.risk_profile == 'Moderate' %}selected{% endif %}>Moderate</option>
+                            <option value="Aggressive" {% if current_user.risk_profile == 'Aggressive' %}selected{% endif %}>Aggressive</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Preferred market
+                        <select name="preferred_market">
+                            <option value="NSE" {% if current_user.preferred_market == 'NSE' %}selected{% endif %}>NSE</option>
+                            <option value="BSE" {% if current_user.preferred_market == 'BSE' %}selected{% endif %}>BSE</option>
+                            <option value="Global" {% if current_user.preferred_market == 'Global' %}selected{% endif %}>Global</option>
+                        </select>
+                    </label>
+                </div>
+
+                <button type="submit">
+                    <i class="bi bi-check2-circle"></i>
+                    Save Profile
+                </button>
+            </form>
+
+            {% endif %}
+
+        </section>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}

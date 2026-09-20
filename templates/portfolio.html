@@ -1,0 +1,602 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portfolio.css') }}">
+{% endblock %}
+
+{% block title %}Investment Portfolio — InvestIQ{% endblock %}
+
+{% block content %}
+<div class="portfolio-page">
+
+    <!-- PAGE HEADER -->
+    <div class="portfolio-header-row">
+        <div>
+            <span class="portfolio-kicker">Asset Management</span>
+            <h1>Investment Portfolio</h1>
+            <p>Real-time tracked holdings, automated P&amp;L accounting, and AI health diagnosis.</p>
+        </div>
+
+        <div class="portfolio-header-actions">
+            <button type="button" class="btn btn-portfolio-header-sell" id="openSellModalBtn">
+                <i class="bi bi-dash-circle-fill"></i> Sell Holding
+            </button>
+            <button type="button" class="btn btn-portfolio-header-buy" id="openBuyModalBtn">
+                <i class="bi bi-plus-circle-fill"></i> Add Transaction
+            </button>
+            <button type="button" class="btn btn-portfolio-header-ai" id="analyzePortfolioAiBtn">
+                <i class="bi bi-stars"></i> Analyze Portfolio
+            </button>
+        </div>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    <div id="portfolioAlertArea"></div>
+
+    <!-- TOP SUMMARY STAT CARDS -->
+    <div class="portfolio-summary-grid">
+        <!-- 1. Total Current Value -->
+        <div class="stat-card card-value">
+            <div class="card-icon purple">
+                <i class="bi bi-wallet2"></i>
+            </div>
+            <div class="card-info">
+                <h6>Current Portfolio Value</h6>
+                <h3>₹{{ "{:,.2f}".format(summary.total_value) }}</h3>
+                <span class="{% if summary.today_pnl > 0 %}text-success{% elif summary.today_pnl < 0 %}text-danger{% else %}text-muted{% endif %}">
+                    <i class="bi {% if summary.today_pnl >= 0 %}bi-arrow-up-right{% else %}bi-arrow-down-right{% endif %}"></i>
+                    {{ "{:+.2f}%".format(summary.today_pnl_pct) }} Today (₹{{ "{:,.2f}".format(summary.today_pnl) }})
+                </span>
+            </div>
+        </div>
+
+        <!-- 2. Total Invested -->
+        <div class="stat-card card-invested">
+            <div class="card-icon blue">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="card-info">
+                <h6>Total Capital Invested</h6>
+                <h3>₹{{ "{:,.2f}".format(summary.total_invested) }}</h3>
+                <span>{{ summary.holdings_count }} Active Holding{% if summary.holdings_count != 1 %}s{% endif %}</span>
+            </div>
+        </div>
+
+        <!-- 3. Total Unrealized P&L -->
+        <div class="stat-card card-unrealized">
+            <div class="card-icon {% if summary.unrealized_pnl >= 0 %}green{% else %}red{% endif %}">
+                <i class="bi {% if summary.unrealized_pnl >= 0 %}bi-graph-up-arrow{% else %}bi-graph-down-arrow{% endif %}"></i>
+            </div>
+            <div class="card-info">
+                <h6>Unrealized P&amp;L</h6>
+                <h3 class="{% if summary.unrealized_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ "{:+,.2f}".format(summary.unrealized_pnl) }}
+                </h3>
+                <span class="{% if summary.unrealized_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ "{:+.2f}%".format(summary.unrealized_pnl_pct) }} Return
+                </span>
+            </div>
+        </div>
+
+        <!-- 4. Realized P&L & Overall Return -->
+        <div class="stat-card card-realized">
+            <div class="card-icon teal">
+                <i class="bi bi-check2-circle"></i>
+            </div>
+            <div class="card-info">
+                <h6>Realized P&amp;L (Booked)</h6>
+                <h3 class="{% if summary.realized_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ "{:+,.2f}".format(summary.realized_pnl) }}
+                </h3>
+                <span>Overall P&amp;L: ₹{{ "{:,.2f}".format(summary.total_pnl) }}</span>
+            </div>
+        </div>
+
+        <!-- 5. Portfolio Health Score -->
+        <div class="stat-card card-health">
+            <div class="card-icon gold">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <div class="card-info">
+                <h6>Health &amp; Risk Score</h6>
+                {% if summary.health_score %}
+                <h3>{{ summary.health_score }}/100</h3>
+                <span class="health-label-badge">{{ summary.health_label }}</span>
+                {% else %}
+                <h3>--</h3>
+                <span>Add stocks to evaluate</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- AI PORTFOLIO ADVISOR PANEL (COLLAPSED BY DEFAULT OR EXPANDED ON CLICK) -->
+    <section class="ai-advisor-panel" id="aiAdvisorPanel" style="display: none;">
+        <div class="ai-advisor-header">
+            <div class="ai-advisor-title">
+                <i class="bi bi-stars"></i>
+                <div>
+                    <h4>InvestIQ AI Portfolio Diagnosis</h4>
+                    <span>Institutional asset allocation &amp; diversification review</span>
+                </div>
+            </div>
+            <button type="button" class="btn-close-advisor" id="closeAdvisorBtn">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="ai-advisor-content" id="aiAdvisorContent">
+            <div class="ai-loading-state">
+                <div class="trading-spinner-container">
+                    <div class="trading-spinner">
+                        <div class="trading-spinner-ring"></div>
+                        <div class="trading-spinner-bars">
+                            <div class="candlestick c1"><div class="wick"></div><div class="body"></div></div>
+                            <div class="candlestick c2"><div class="wick"></div><div class="body"></div></div>
+                            <div class="candlestick c3"><div class="wick"></div><div class="body"></div></div>
+                            <div class="candlestick c4"><div class="wick"></div><div class="body"></div></div>
+                            <div class="candlestick c5"><div class="wick"></div><div class="body"></div></div>
+                        </div>
+                        <div class="trading-spinner-glow"></div>
+                    </div>
+                    <div class="trading-spinner-label">Analyzing Portfolio Health</div>
+                    <div class="trading-spinner-subtext">Evaluating asset allocation, sector concentration, and risk parameters...</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MIDDLE SECTION: ALLOCATION & RISK DIVERSIFICATION -->
+    <div class="portfolio-middle-grid">
+        <!-- SECTOR ALLOCATION BREAKDOWN -->
+        <div class="portfolio-panel sector-panel">
+            <div class="panel-header">
+                <div>
+                    <h4>Sector Allocation</h4>
+                    <span>Capital spread across market sectors</span>
+                </div>
+                <i class="bi bi-pie-chart"></i>
+            </div>
+
+            <div class="sector-content">
+                {% if summary.sector_allocation %}
+                <div class="sector-bars-list">
+                    {% for sec in summary.sector_allocation %}
+                    <div class="sector-bar-item">
+                        <div class="sector-bar-meta">
+                            <div class="sector-name-group">
+                                <span class="sector-dot sector-dot-{{ loop.index0 % 6 }}"></span>
+                                <strong>{{ sec.sector }}</strong>
+                            </div>
+                            <span>₹{{ "{:,.2f}".format(sec.value) }} ({{ sec.percentage }}%)</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill sector-fill-{{ loop.index0 % 6 }}" style="--bar-pct: {{ sec.percentage }}%;"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="panel-empty-state">
+                    <i class="bi bi-pie-chart"></i>
+                    <p>No sector data available. Add holdings to view allocation breakdown.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- RISK & DIVERSIFICATION METRICS -->
+        <div class="portfolio-panel risk-panel">
+            <div class="panel-header">
+                <div>
+                    <h4>Risk &amp; Diversification</h4>
+                    <span>Concentration and volatility indicators</span>
+                </div>
+                <i class="bi bi-shield-lock"></i>
+            </div>
+
+            <div class="risk-metrics-content">
+                {% if summary.has_holdings %}
+                <div class="risk-metric-row">
+                    <div>
+                        <strong>Portfolio Concentration</strong>
+                        <small>Single-stock dependency</small>
+                    </div>
+                    <span class="badge-risk badge-{{ summary.risk_metrics.concentration.lower() }}">
+                        {{ summary.risk_metrics.concentration }}
+                    </span>
+                </div>
+
+                <div class="risk-metric-row">
+                    <div>
+                        <strong>Largest Holding Exposure</strong>
+                        <small>{{ summary.risk_metrics.largest_holding_name }}</small>
+                    </div>
+                    <b>{{ summary.risk_metrics.largest_holding_pct }}%</b>
+                </div>
+
+                <div class="risk-metric-row">
+                    <div>
+                        <strong>Top Sector Weight</strong>
+                        <small>{{ summary.risk_metrics.top_sector }}</small>
+                    </div>
+                    <b>{{ summary.risk_metrics.top_sector_pct }}%</b>
+                </div>
+
+                {% if summary.health_breakdown %}
+                <div class="health-breakdown-tags">
+                    <span>Diversification: <b>{{ summary.health_breakdown.diversification_score }}%</b></span>
+                    <span>Profitable Assets: <b>{{ summary.health_breakdown.profitable_holdings_ratio }}</b></span>
+                    <span>Active Sectors: <b>{{ summary.health_breakdown.sector_spread }}</b></span>
+                    <span>Concentration Risk: <b>{{ summary.health_breakdown.concentration_risk }}</b></span>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="panel-empty-state">
+                    <i class="bi bi-shield"></i>
+                    <p>Add assets to compute concentration and portfolio risk metrics.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- HOLDINGS TABLE SECTION -->
+    <div class="portfolio-panel holdings-table-panel">
+        <div class="panel-header">
+            <div>
+                <h4>Current Holdings</h4>
+                <span>Track live prices, weighted average entry costs, and unrealized returns</span>
+            </div>
+            <div class="holdings-header-actions">
+                <div class="holdings-search-wrapper">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" id="holdingSearchInput" class="holding-search-input" placeholder="Search holdings by symbol or name...">
+                </div>
+                <button type="button" class="btn btn-holdings-table-buy" id="tableAddBtn">
+                    <i class="bi bi-plus-lg"></i> Buy Stock
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table holdings-table" id="holdingsTable">
+                <thead>
+                    <tr>
+                        <th>Stock / Asset</th>
+                        <th>Sector</th>
+                        <th class="text-end">Quantity</th>
+                        <th class="text-end">Avg Buy Price</th>
+                        <th class="text-end">Live Price</th>
+                        <th class="text-end">Invested</th>
+                        <th class="text-end">Current Value</th>
+                        <th class="text-end">Unrealized P&amp;L</th>
+                        <th class="text-end">Weight</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if summary.holdings %}
+                    {% for h in summary.holdings %}
+                    <tr data-symbol="{{ h.symbol }}" data-name="{{ h.name }}">
+                        <td>
+                            <div class="stock-title-cell">
+                                <div class="stock-avatar-mini">{{ h.display_symbol[:2] }}</div>
+                                <div>
+                                    <a href="{{ url_for('analysis') }}?symbol={{ h.symbol }}" class="stock-symbol-link">
+                                        <strong>{{ h.display_symbol }}</strong>
+                                    </a>
+                                    <small>{{ h.name }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="sector-tag">{{ h.sector }}</span></td>
+                        <td class="text-end font-monospace">{{ "{:g}".format(h.quantity) }}</td>
+                        <td class="text-end font-monospace">₹{{ "{:,.2f}".format(h.avg_price) }}</td>
+                        <td class="text-end font-monospace">
+                            <strong>₹{{ "{:,.2f}".format(h.current_price) }}</strong>
+                            <div class="{% if h.day_change_pct > 0 %}text-success{% elif h.day_change_pct < 0 %}text-danger{% else %}text-muted{% endif %}">
+                                <small>{{ "{:+.2f}%".format(h.day_change_pct) }}</small>
+                            </div>
+                        </td>
+                        <td class="text-end font-monospace">₹{{ "{:,.2f}".format(h.invested_value) }}</td>
+                        <td class="text-end font-monospace"><strong>₹{{ "{:,.2f}".format(h.current_value) }}</strong></td>
+                        <td class="text-end font-monospace {% if h.unrealized_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            <strong>{{ "{:+,.2f}".format(h.unrealized_pnl) }}</strong>
+                            <div><small>({{ "{:+.2f}%".format(h.unrealized_pnl_pct) }})</small></div>
+                        </td>
+                        <td class="text-end font-monospace">{{ h.allocation_pct }}%</td>
+                        <td class="text-center">
+                            <div class="table-actions-group">
+                                <button type="button" class="btn-table-action action-buy quick-buy-btn" data-symbol="{{ h.symbol }}" data-price="{{ h.current_price }}" title="Buy more shares">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                                <button type="button" class="btn-table-action action-sell quick-sell-btn" data-symbol="{{ h.symbol }}" data-qty="{{ h.quantity }}" data-price="{{ h.current_price }}" title="Sell shares">
+                                    <i class="bi bi-dash-lg"></i>
+                                </button>
+                                <a href="{{ url_for('analysis') }}?symbol={{ h.symbol }}" class="btn-table-action action-view" title="View Full AI Analysis">
+                                    <i class="bi bi-graph-up-arrow"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center py-5">
+                            <div class="empty-holdings-container">
+                                <div class="empty-icon-circle">
+                                    <i class="bi bi-wallet2"></i>
+                                </div>
+                                <h5>Your portfolio is empty</h5>
+                                <p>You haven't recorded any stock purchases yet. Add your first transaction to start real-time tracking.</p>
+                                <button type="button" class="btn btn-portfolio-header-buy mt-3" id="emptyStateAddBtn">
+                                    <i class="bi bi-plus-circle-fill"></i> Add First Holding
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TRANSACTION HISTORY LOG -->
+    <div class="portfolio-panel transactions-panel">
+        <div class="panel-header">
+            <div>
+                <h4>Transaction History</h4>
+                <span>Chronological audit trail of all buy and sell executions</span>
+            </div>
+            <i class="bi bi-clock-history"></i>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table transactions-table">
+                <thead>
+                    <tr>
+                        <th>Date &amp; Time</th>
+                        <th>Type</th>
+                        <th>Asset</th>
+                        <th class="text-end">Quantity</th>
+                        <th class="text-end">Execution Price</th>
+                        <th class="text-end">Total Amount</th>
+                        <th class="text-end">Realized P&amp;L</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if transactions %}
+                    {% for txn in transactions %}
+                    <tr>
+                        <td><small>{{ txn.created_at.strftime('%d %b %Y, %I:%M %p') }}</small></td>
+                        <td>
+                            <span class="txn-badge txn-{{ txn.transaction_type.lower() }}">
+                                {{ txn.transaction_type }}
+                            </span>
+                        </td>
+                        <td>
+                            <strong>{{ txn.symbol.replace('.NS', '').replace('.BO', '') }}</strong>
+                            <small class="text-muted d-block">{{ txn.stock_name }}</small>
+                        </td>
+                        <td class="text-end font-monospace">{{ "{:g}".format(txn.quantity) }}</td>
+                        <td class="text-end font-monospace">₹{{ "{:,.2f}".format(txn.price) }}</td>
+                        <td class="text-end font-monospace">₹{{ "{:,.2f}".format(txn.total_amount) }}</td>
+                        <td class="text-end font-monospace">
+                            {% if txn.transaction_type == 'SELL' %}
+                            <span class="{% if txn.realized_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ "{:+,.2f}".format(txn.realized_pnl) }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted">--</span>
+                            {% endif %}
+                        </td>
+                        <td><small class="text-muted">{{ txn.notes or 'Standard order' }}</small></td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            No transactions recorded yet.
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- BUY TRANSACTION MODAL -->
+<div class="modal fade trade-modal" id="buyModal" tabindex="-1" aria-labelledby="buyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content trade-modal-content">
+            <div class="trade-modal-header buy-header">
+                <div class="modal-header-left">
+                    <div class="trade-modal-icon-badge buy-icon-badge">
+                        <i class="bi bi-bag-plus-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="trade-modal-title" id="buyModalLabel">Buy Stock / Add Holding</h4>
+                        <p class="trade-modal-subtitle">Record stock acquisition or execute new portfolio position</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <form id="buyForm">
+                <div class="trade-modal-body">
+                    <!-- Stock Symbol Search -->
+                    <div class="trade-form-group">
+                        <label for="buySymbolInput" class="trade-modal-label">
+                            <span>Stock Symbol / Ticker</span>
+                            <span class="label-hint">NSE / BSE</span>
+                        </label>
+                        <div class="trade-input-with-button">
+                            <div class="trade-input-prefix">
+                                <i class="bi bi-search"></i>
+                            </div>
+                            <input type="text" class="trade-input with-prefix" id="buySymbolInput" name="symbol" placeholder="e.g. RELIANCE, TCS, INFY" required autocomplete="off">
+                            <button type="button" class="btn-fetch-live" id="fetchBuyPriceBtn" title="Fetch current market price">
+                                <i class="bi bi-lightning-charge-fill"></i>
+                                <span>Fetch Price</span>
+                            </button>
+                        </div>
+                        <div id="buySymbolSuggestions" class="symbol-suggestions-dropdown"></div>
+                        <div class="stock-live-meta-badge" id="buyStockMeta"></div>
+                    </div>
+
+                    <!-- Quantity & Price 2-Column Grid -->
+                    <div class="trade-2col-grid">
+                        <div class="trade-form-group">
+                            <label for="buyQtyInput" class="trade-modal-label">Quantity (Shares)</label>
+                            <input type="number" step="any" min="0.001" class="trade-input font-monospace" id="buyQtyInput" name="quantity" placeholder="10" required>
+                        </div>
+                        <div class="trade-form-group">
+                            <label for="buyPriceInput" class="trade-modal-label">Purchase Price (₹)</label>
+                            <input type="number" step="any" min="0.01" class="trade-input font-monospace" id="buyPriceInput" name="price" placeholder="0.00" required>
+                        </div>
+                    </div>
+
+                    <!-- Fees & Total Outlay Card -->
+                    <div class="trade-2col-grid">
+                        <div class="trade-form-group">
+                            <label for="buyFeesInput" class="trade-modal-label">Brokerage &amp; Taxes (₹)</label>
+                            <input type="number" step="any" min="0" class="trade-input font-monospace" id="buyFeesInput" name="fees" value="0.0">
+                        </div>
+                        <div class="trade-summary-wrapper">
+                            <div class="trade-summary-card buy-summary">
+                                <div class="summary-card-header">
+                                    <span class="summary-label">Total Est. Outlay</span>
+                                    <span class="summary-subtag">Cost + Fees</span>
+                                </div>
+                                <div class="summary-amount font-monospace" id="buyTotalPreview">₹0.00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes Field -->
+                    <div class="trade-form-group">
+                        <label for="buyNotesInput" class="trade-modal-label">
+                            <span>Strategy Notes</span>
+                            <span class="label-optional">Optional</span>
+                        </label>
+                        <input type="text" class="trade-input" id="buyNotesInput" name="notes" placeholder="e.g. Monthly SIP / Swing entry / Long term">
+                    </div>
+                </div>
+
+                <div class="trade-modal-footer">
+                    <button type="button" class="btn-trade-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-trade-confirm btn-trade-confirm-buy" id="submitBuyBtn">
+                        <i class="bi bi-check2-circle"></i>
+                        <span>Confirm Purchase</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- SELL TRANSACTION MODAL -->
+<div class="modal fade trade-modal" id="sellModal" tabindex="-1" aria-labelledby="sellModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content trade-modal-content">
+            <div class="trade-modal-header sell-header">
+                <div class="modal-header-left">
+                    <div class="trade-modal-icon-badge sell-icon-badge">
+                        <i class="bi bi-bag-dash-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="trade-modal-title" id="sellModalLabel">Sell Holding / Book Profit</h4>
+                        <p class="trade-modal-subtitle">Execute sell transaction &amp; realize portfolio gains or losses</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <form id="sellForm">
+                <div class="trade-modal-body">
+                    <!-- Holding Dropdown -->
+                    <div class="trade-form-group">
+                        <label for="sellSymbolSelect" class="trade-modal-label">
+                            <span>Select Holding to Sell</span>
+                            <span class="label-hint">Active Holdings</span>
+                        </label>
+                        <div class="custom-select-wrapper">
+                            <select class="trade-select" id="sellSymbolSelect" name="symbol" required>
+                                <option value="">-- Choose Stock from Portfolio --</option>
+                                {% for h in summary.holdings %}
+                                <option value="{{ h.symbol }}" data-qty="{{ h.quantity }}" data-avg="{{ h.avg_price }}" data-price="{{ h.current_price }}">
+                                    {{ h.display_symbol }} — Available: {{ "{:g}".format(h.quantity) }} shares (Avg: ₹{{ "{:,.2f}".format(h.avg_price) }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <i class="bi bi-chevron-down select-chevron"></i>
+                        </div>
+                    </div>
+
+                    <!-- Quantity & Selling Price 2-Column Grid -->
+                    <div class="trade-2col-grid">
+                        <div class="trade-form-group">
+                            <div class="label-with-max">
+                                <label for="sellQtyInput" class="trade-modal-label">Sell Quantity</label>
+                                <span class="max-qty-pill" id="sellMaxQtyText">Max: 0 shares</span>
+                            </div>
+                            <input type="number" step="any" min="0.001" class="trade-input font-monospace" id="sellQtyInput" name="quantity" placeholder="0" required>
+                        </div>
+                        <div class="trade-form-group">
+                            <label for="sellPriceInput" class="trade-modal-label">Selling Price (₹)</label>
+                            <input type="number" step="any" min="0.01" class="trade-input font-monospace" id="sellPriceInput" name="price" placeholder="0.00" required>
+                        </div>
+                    </div>
+
+                    <!-- Fees & Realized P&L Card -->
+                    <div class="trade-2col-grid">
+                        <div class="trade-form-group">
+                            <label for="sellFeesInput" class="trade-modal-label">Brokerage &amp; Taxes (₹)</label>
+                            <input type="number" step="any" min="0" class="trade-input font-monospace" id="sellFeesInput" name="fees" value="0.0">
+                        </div>
+                        <div class="trade-summary-wrapper">
+                            <div class="trade-summary-card sell-summary">
+                                <div class="summary-card-header">
+                                    <span class="summary-label">Est. Realized P&amp;L</span>
+                                    <span class="summary-subtag">Net Return</span>
+                                </div>
+                                <div class="summary-amount font-monospace" id="sellPnlPreview">₹0.00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes Field -->
+                    <div class="trade-form-group">
+                        <label for="sellNotesInput" class="trade-modal-label">
+                            <span>Exit Notes</span>
+                            <span class="label-optional">Optional</span>
+                        </label>
+                        <input type="text" class="trade-input" id="sellNotesInput" name="notes" placeholder="e.g. Target hit / Stop loss / Rebalancing">
+                    </div>
+                </div>
+
+                <div class="trade-modal-footer">
+                    <button type="button" class="btn-trade-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-trade-confirm btn-trade-confirm-sell" id="submitSellBtn">
+                        <i class="bi bi-check2-circle"></i>
+                        <span>Confirm Sell</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/portfolio.js') }}"></script>
+{% endblock %}

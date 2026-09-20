@@ -1,0 +1,747 @@
+<!-- ==========================================
+     FULL WIDTH NAVBAR
+========================================== -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+
+<header class="top-navbar">
+
+    <!-- LEFT: BRAND / LOGO -->
+    <div class="navbar-left">
+        <a href="/dashboard" class="navbar-brand" title="GetStockIQ Home">
+            <div class="navbar-brand-icon">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div class="navbar-brand-text">
+                <h4>GetStockIQ</h4>
+                <span>Intelligent Multi-Factor Market Strategist</span>
+            </div>
+        </a>
+    </div>
+
+    <!-- CENTER: NAVIGATION LINKS -->
+    <nav class="navbar-center" aria-label="Main Navigation">
+        <div class="top-nav-links">
+            <a href="/dashboard" class="top-nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                Dashboard
+            </a>
+            <a href="{{ url_for('portfolio') }}" class="top-nav-item {% if request.endpoint == 'portfolio' %}active{% endif %}">
+                Portfolio
+            </a>
+            <a href="/dashboard#market" class="top-nav-item">
+                Market
+            </a>
+            <a href="{{ url_for('compare') }}" class="top-nav-item {% if request.endpoint in ['compare', 'compare_results'] %}active{% endif %}">
+                Compare Stocks
+            </a>
+            <a href="{{ url_for('watchlist') }}" class="top-nav-item {% if request.endpoint == 'watchlist' %}active{% endif %}">
+                Watchlist
+            </a>
+        </div>
+    </nav>
+
+
+    <!-- RIGHT SECTION -->
+
+    <div class="navbar-right">
+
+
+        <!-- STOCK SEARCH -->
+
+        <div class="navbar-search-wrapper">
+
+            <form action="/analysis" method="GET" class="navbar-search-form" autocomplete="off">
+
+                <i class="bi bi-search"></i>
+
+                <input type="text" id="stockSearch" name="symbol" placeholder="Search stocks..." autocomplete="off">
+
+            </form>
+
+
+            <!-- SEARCH SUGGESTIONS -->
+
+            <div id="stockSuggestions" class="stock-suggestions">
+
+                <!-- Results will be added by JavaScript -->
+
+            </div>
+
+        </div>
+
+
+        <!-- NOTIFICATION -->
+
+        <div class="notification-wrapper">
+            <button type="button" class="navbar-icon-button notification-button" id="notificationButton"
+                    title="Notifications" aria-label="Open notifications" aria-expanded="false">
+                <i class="bi bi-bell"></i>
+                <span class="notification-badge" id="notificationBadge" hidden>0</span>
+            </button>
+
+            <section class="notification-dropdown" id="notificationDropdown" aria-label="Live notifications">
+                <div class="notification-header">
+                    <div>
+                        <strong>Live notifications</strong>
+                        <span id="notificationUpdated">Updating market data…</span>
+                    </div>
+                    <button type="button" id="markNotificationsRead">Mark all read</button>
+                </div>
+                <div class="notification-list" id="notificationList">
+                    <div class="notification-loading"><i class="bi bi-arrow-repeat"></i> Loading live updates…</div>
+                </div>
+            </section>
+        </div>
+
+
+        <!-- USER PROFILE -->
+
+        <div class="navbar-profile">
+
+            <button class="profile-button" type="button" id="profileDropdownButton">
+
+                <!-- Sirf naam ka first letter -->
+
+                <div class="profile-avatar">
+
+                    {{ current_user.full_name[0]|upper }}
+
+                </div>
+
+
+                <!-- User ka poora naam -->
+
+                <div class="profile-information">
+
+                    <strong>
+
+                        {{ current_user.full_name }}
+
+                    </strong>
+
+                    <span>Investor</span>
+
+                </div>
+
+
+                <i class="bi bi-chevron-down"></i>
+
+            </button>
+
+
+            <!-- PROFILE DROPDOWN -->
+
+            <div class="profile-dropdown" id="profileDropdown">
+
+                <div class="profile-dropdown-header">
+
+                    <!-- Dropdown avatar -->
+
+                    <div class="profile-avatar">
+
+                        {{ current_user.full_name[0]|upper }}
+
+                    </div>
+
+
+                    <!-- Dropdown user information -->
+
+                    <div>
+
+                        <strong>
+
+                            {{ current_user.full_name }}
+
+                        </strong>
+
+                        <span>Investor Account</span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="dropdown-divider"></div>
+
+
+                <a href="{{ url_for('portfolio') }}">
+
+                    <i class="bi bi-wallet2"></i>
+
+                    Portfolio
+
+                </a>
+
+                <a href="{{ url_for('profile') }}">
+
+                    <i class="bi bi-person"></i>
+
+                    My Profile
+
+                </a>
+
+
+                <a href="{{ url_for('settings') }}">
+
+                    <i class="bi bi-gear"></i>
+
+                    Settings
+
+                </a>
+
+
+                <div class="dropdown-divider"></div>
+
+
+                <a href="/logout" class="dropdown-logout">
+
+                    <i class="bi bi-box-arrow-right"></i>
+
+                    Logout
+
+                </a>
+
+            </div>
+
+        </div>
+
+</header>
+
+
+<!-- ==========================================
+     NAVBAR JAVASCRIPT
+========================================== -->
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const navItems = document.querySelectorAll(".top-nav-item");
+
+        function updateHashNavigationState() {
+
+            if (window.location.pathname !== "/dashboard") {
+                return;
+            }
+
+            const dashboardLink =
+                document.querySelector('.top-nav-item[href="/dashboard"]');
+
+            const marketLink =
+                document.querySelector('.top-nav-item[href="/dashboard#market"]');
+
+            if (!dashboardLink || !marketLink) {
+                return;
+            }
+
+            navItems.forEach(function (item) {
+                item.classList.remove("active");
+            });
+
+            if (window.location.hash === "#market") {
+                marketLink.classList.add("active");
+            }
+
+            else {
+                dashboardLink.classList.add("active");
+            }
+
+        }
+
+        updateHashNavigationState();
+
+        window.addEventListener(
+            "hashchange",
+            updateHashNavigationState
+        );
+
+
+        /* ======================================
+           PROFILE DROPDOWN
+        ====================================== */
+
+
+        const profileButton =
+            document.getElementById(
+                "profileDropdownButton"
+            );
+
+
+        const profileDropdown =
+            document.getElementById(
+                "profileDropdown"
+            );
+
+
+        if (
+            profileButton &&
+            profileDropdown
+        ) {
+
+
+            profileButton.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+                    profileDropdown.classList.toggle(
+                        "show"
+                    );
+
+                }
+            );
+
+
+            document.addEventListener(
+                "click",
+                function () {
+
+                    profileDropdown.classList.remove(
+                        "show"
+                    );
+
+                }
+            );
+
+
+            profileDropdown.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+                }
+            );
+
+        }
+
+
+
+        /* ======================================
+           STOCK SEARCH
+        ====================================== */
+
+
+        const searchInput =
+            document.getElementById(
+                "stockSearch"
+            );
+
+
+        const suggestionBox =
+            document.getElementById(
+                "stockSuggestions"
+            );
+
+
+        let searchTimer;
+
+
+        if (
+            searchInput &&
+            suggestionBox
+        ) {
+
+
+            searchInput.addEventListener(
+                "input",
+                function () {
+
+
+                    clearTimeout(
+                        searchTimer
+                    );
+
+
+                    const query =
+                        searchInput.value.trim();
+
+
+                    if (
+                        query.length < 1
+                    ) {
+
+                        suggestionBox.innerHTML = "";
+
+                        suggestionBox.classList.remove(
+                            "show"
+                        );
+
+                        return;
+
+                    }
+
+
+                    suggestionBox.innerHTML = `
+                    <div class="search-loading" style="padding: 12px 16px; display: flex; justify-content: center;">
+                        ${window.getTradingSpinnerHTML ? window.getTradingSpinnerHTML({ size: 'sm', text: 'Searching Market...', centered: true }) : 'Searching stocks...'}
+                    </div>
+                `;
+
+
+                    suggestionBox.classList.add(
+                        "show"
+                    );
+
+
+                    searchTimer = setTimeout(
+
+                        async function () {
+
+
+                            try {
+
+
+                                const response =
+                                    await fetch(
+
+                                        `/api/search-stocks?q=${encodeURIComponent(
+                                            query
+                                        )}`
+
+                                    );
+
+
+                                const stocks =
+                                    await response.json();
+
+
+                                suggestionBox.innerHTML = "";
+
+
+                                if (
+                                    stocks.length === 0
+                                ) {
+
+
+                                    suggestionBox.innerHTML = `
+
+                                    <div class="no-search-result">
+
+                                        No stocks found
+
+                                    </div>
+
+                                `;
+
+
+                                    return;
+
+                                }
+
+
+                                stocks.forEach(
+
+                                    function (stock) {
+
+
+                                        const item =
+                                            document.createElement(
+                                                "a"
+                                            );
+
+
+                                        item.className =
+                                            "stock-suggestion-item";
+
+                                        item.onclick = function () {
+
+                                            localStorage.setItem(
+                                                "selectedStock",
+                                                stock.symbol
+                                            );
+
+                                        };
+                                        item.href =
+
+                                            `/analysis?symbol=${encodeURIComponent(
+
+                                                stock.symbol
+
+                                            )}`;
+
+
+                                        item.innerHTML = `
+
+                                        <div
+                                            class="suggestion-stock-icon"
+                                        >
+
+                                            <i
+                                                class="bi
+                                                       bi-graph-up-arrow"
+                                            ></i>
+
+                                        </div>
+
+
+                                        <div
+                                            class="suggestion-stock-info"
+                                        >
+
+                                            <strong>
+
+                                                ${stock.name}
+
+                                            </strong>
+
+                                            <span>
+
+                                                Stock •
+                                                ${stock.display_symbol
+                                            || stock.symbol}
+
+                                            </span>
+
+                                        </div>
+
+                                    `;
+
+
+                                        suggestionBox.appendChild(
+                                            item
+                                        );
+
+
+                                    }
+
+                                );
+
+
+                            }
+
+
+                            catch (
+                            error
+                            ) {
+
+
+                                suggestionBox.innerHTML = `
+
+                                <div class="no-search-result">
+
+                                    Unable to search stocks
+
+                                </div>
+
+                            `;
+
+
+                            }
+
+
+                        },
+
+                        350
+
+                    );
+
+
+                }
+
+            );
+
+
+
+            /* SUBMIT FIRST RESULT */
+
+
+            searchInput
+                .closest("form")
+                .addEventListener(
+
+                    "submit",
+
+                    function (event) {
+
+
+                        const firstResult =
+
+                            suggestionBox.querySelector(
+
+                                ".stock-suggestion-item"
+
+                            );
+
+
+                        if (
+                            firstResult
+                        ) {
+
+
+                            event.preventDefault();
+
+
+                            window.location.href =
+
+                                firstResult.href;
+
+
+                        }
+
+
+                    }
+
+                );
+
+
+
+            /* CLOSE SEARCH RESULTS */
+
+
+            document.addEventListener(
+
+                "click",
+
+                function (event) {
+
+
+                    if (
+
+                        !event.target.closest(
+
+                            ".navbar-search-wrapper"
+
+                        )
+
+                    ) {
+
+
+                        suggestionBox.classList.remove(
+
+                            "show"
+
+                        );
+
+
+                    }
+
+
+                }
+
+            );
+
+
+
+            /* OPEN AGAIN ON CLICK */
+
+
+            searchInput.addEventListener(
+
+                "focus",
+
+                function () {
+
+
+                    if (
+
+                        suggestionBox.innerHTML.trim()
+
+                    ) {
+
+
+                        suggestionBox.classList.add(
+
+                            "show"
+
+                        );
+
+
+                    }
+
+
+                }
+
+            );
+
+
+        }
+
+
+    });
+
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const button = document.getElementById("notificationButton");
+        const dropdown = document.getElementById("notificationDropdown");
+        const list = document.getElementById("notificationList");
+        const badge = document.getElementById("notificationBadge");
+        const updated = document.getElementById("notificationUpdated");
+        const markRead = document.getElementById("markNotificationsRead");
+        let hasLoaded = false;
+
+        function escapeHtml(value) {
+            const element = document.createElement("div");
+            element.textContent = value;
+            return element.innerHTML;
+        }
+
+        function setBadge(count) {
+            if (!badge) return;
+            const isRead = localStorage.getItem("investiqNotificationsRead") === "true";
+            badge.hidden = isRead || !count;
+            badge.textContent = count > 9 ? "9+" : count;
+        }
+
+        async function loadNotifications() {
+            if (!list) return;
+            try {
+                const response = await fetch("/api/notifications", { cache: "no-store" });
+                const data = await response.json();
+                if (!response.ok || !data.success) throw new Error("Notifications unavailable");
+
+                const notifications = data.notifications || [];
+                list.innerHTML = notifications.length
+                    ? notifications.map(function (item) {
+                        return `<article class="notification-item">
+                            <span class="notification-status ${item.type === "down" ? "down" : ""}"></span>
+                            <div class="notification-copy">
+                                <strong>${escapeHtml(item.title)}</strong>
+                                <p>${escapeHtml(item.detail)}</p>
+                                <time>${escapeHtml(item.time)}</time>
+                            </div>
+                        </article>`;
+                    }).join("")
+                    : '<div class="notification-empty">No live updates available right now.</div>';
+                if (updated) updated.textContent = `Updated ${data.updated_at || "just now"}`;
+                setBadge(notifications.length);
+                hasLoaded = true;
+            } catch (error) {
+                list.innerHTML = '<div class="notification-empty">Could not load live notifications. Please try again.</div>';
+                if (updated) updated.textContent = "Connection unavailable";
+            }
+        }
+
+        if (button && dropdown) {
+            button.addEventListener("click", function (event) {
+                event.stopPropagation();
+                const isOpen = dropdown.classList.toggle("show");
+                button.setAttribute("aria-expanded", String(isOpen));
+                if (isOpen) {
+                    list.innerHTML = `<div class="notification-loading" style="padding: 14px; display: flex; justify-content: center;">${window.getTradingSpinnerHTML ? window.getTradingSpinnerHTML({ size: 'sm', text: 'Loading live updates...', centered: true }) : 'Loading live updates...'}</div>`;
+                    loadNotifications();
+                }
+            });
+
+            dropdown.addEventListener("click", function (event) { event.stopPropagation(); });
+            document.addEventListener("click", function () {
+                dropdown.classList.remove("show");
+                button.setAttribute("aria-expanded", "false");
+            });
+        }
+
+        if (markRead) {
+            markRead.addEventListener("click", function () {
+                localStorage.setItem("investiqNotificationsRead", "true");
+                setBadge(0);
+            });
+        }
+
+        loadNotifications();
+        window.setInterval(function () {
+            if (!document.hidden && (hasLoaded || (dropdown && dropdown.classList.contains("show")))) loadNotifications();
+        }, 60000);
+    });
+</script>

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block auth %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+
+<div class="auth-split-page">
+    <div class="auth-split-card">
+        <section class="auth-split-form">
+            <a href="/" class="auth-mini-brand">
+                <span></span>
+                GetStockIQ
+            </a>
+
+            <div class="auth-copy">
+                <h1>Create Account</h1>
+                <p>Intelligent Multi-Factor Market Strategist</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} mb-3">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('register') }}" method="POST" class="split-auth-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label class="auth-field">
+                    <i class="bi bi-person"></i>
+                    <input type="text" name="fullname" class="form-control" placeholder="Full Name" required>
+                </label>
+                <label class="auth-field">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" name="email" class="form-control" placeholder="Email" required>
+                </label>
+                <label class="auth-field">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                </label>
+                <label class="auth-field">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" name="confirm" class="form-control" placeholder="Confirm Password" required>
+                </label>
+
+                <button class="btn btn-login">Create Account</button>
+            </form>
+
+            <p class="split-auth-bottom">
+                Already have an account?
+                <a href="/login">Login</a>
+            </p>
+        </section>
+
+        <section class="auth-visual-panel">
+            <div class="market-visual">
+                <div class="visual-ribbon ribbon-a"></div>
+                <div class="visual-ribbon ribbon-b"></div>
+                <div class="visual-cloud cloud-a"></div>
+                <div class="visual-cloud cloud-b"></div>
+
+                <div class="chart-board register-board">
+                    <span>Account Setup</span>
+                    <div class="account-steps-visual">
+                        <i class="done"></i>
+                        <i class="done"></i>
+                        <i></i>
+                    </div>
+                </div>
+
+                <div class="trend-card">
+                    <span>Diversified Allocation</span>
+                    <div class="allocation-bars">
+                        <i style="height: 86%"></i>
+                        <i style="height: 62%"></i>
+                        <i style="height: 44%"></i>
+                        <i style="height: 72%"></i>
+                    </div>
+                </div>
+
+                <div class="market-stat-card">
+                    <small>Smart Portfolio</small>
+                    <strong>Ready</strong>
+                    <span>Start tracking today</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+{% endblock %}

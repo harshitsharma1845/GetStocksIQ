@@ -1,0 +1,466 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+<div class="dashboard-heading">
+    <div>
+        <span class="dashboard-kicker">Investment Overview</span>
+        <h1>Welcome back, {{ current_user.full_name }} 👋</h1>
+        <p>Here's your live investment dashboard.</p>
+    </div>
+
+</div>
+
+<div class="dashboard-grid">
+
+    <!-- Portfolio -->
+
+    <a href="{{ url_for('portfolio') }}" class="stat-card text-decoration-none" style="cursor: pointer;">
+
+        <div class="card-icon green">
+            <i class="bi bi-wallet2"></i>
+        </div>
+
+        <div class="card-info">
+
+            <h6>Portfolio Value</h6>
+
+            <h3>{{ data.portfolio_value }}</h3>
+
+            <span>{{ data.today_change }} Today</span>
+
+        </div>
+
+    </a>
+
+
+    <!-- NIFTY -->
+
+    <div class="stat-card">
+
+        <div class="card-icon blue">
+            <i class="bi bi-graph-up-arrow"></i>
+        </div>
+
+        <div class="card-info">
+
+            <h6>NIFTY 50</h6>
+
+            <h3>{{ data.nifty }}</h3>
+
+            <span>{{ data.nifty_change }}</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- SENSEX -->
+
+    <div class="stat-card">
+
+        <div class="card-icon purple-dark">
+            <i class="bi bi-bar-chart-line"></i>
+        </div>
+
+        <div class="card-info">
+
+            <h6>SENSEX</h6>
+
+            <h3>{{ data.sensex }}</h3>
+
+            <span>{{ data.sensex_change }}</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+<section class="portfolio-workspace">
+    <div id="market" class="chart-card market-overview-card dashboard-panel panel-large">
+        <div class="card-header market-chart-header">
+            <div>
+                <h4>Market Overview</h4>
+                <span id="marketRangeDescription">
+                    NIFTY 50 and SENSEX performance over the last 6 months
+                </span>
+            </div>
+
+            <div class="market-header-actions">
+                <div class="market-range-tabs" aria-label="Market overview range">
+                    <button type="button" class="market-range-button" data-period="1mo" data-label="1 month">
+                        1M
+                    </button>
+                    <button type="button" class="market-range-button" data-period="3mo" data-label="3 months">
+                        3M
+                    </button>
+                    <button type="button" class="market-range-button active" data-period="6mo" data-label="6 months">
+                        6M
+                    </button>
+                </div>
+
+                <div class="live-market-badge">
+                    <span class="live-dot"></span>
+                    Live Market
+                </div>
+            </div>
+        </div>
+
+        <div id="market-chart" class="dashboard-market-chart" aria-live="polite">
+            {% if market_chart %}
+            {{ market_chart | safe }}
+            {% else %}
+            <div class="chart-placeholder chart-loading-state">
+                <div class="trading-spinner-container">
+                    <div class="trading-spinner">
+                        <div class="trading-spinner-ring"></div>
+                        <div class="trading-spinner-bars">
+                            <div class="candlestick c1"><div class="wick"></div><div class="body"></div></div>
+                            <div class="candlestick c2"><div class="wick"></div><div class="body"></div></div>
+                            <div class="candlestick c3"><div class="wick"></div><div class="body"></div></div>
+                            <div class="candlestick c4"><div class="wick"></div><div class="body"></div></div>
+                            <div class="candlestick c5"><div class="wick"></div><div class="body"></div></div>
+                        </div>
+                        <div class="trading-spinner-glow"></div>
+                    </div>
+                    <div class="trading-spinner-label">Loading Live Market Chart</div>
+                    <div class="trading-spinner-subtext">NIFTY 50 and SENSEX data is syncing from market feeds</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <aside class="dashboard-panel holdings-panel">
+        <div class="panel-title-row">
+            <div>
+                <h4>Holdings</h4>
+                <span>Tracked portfolio assets</span>
+            </div>
+            <a href="{{ url_for('portfolio') }}">Manage <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        <div class="holding-list">
+            {% if holdings %}
+            {% for stock in holdings %}
+            <a href="{{ url_for('analysis') }}?symbol={{ stock.symbol }}" class="holding-item">
+                <div class="stock-avatar">{{ stock.display_symbol[:2] }}</div>
+                <div class="holding-name">
+                    <strong>{{ stock.display_symbol }}</strong>
+                    <span>{{ stock.name }}</span>
+                </div>
+                <div class="holding-price">₹{{ "{:,.2f}".format(stock.current_price) }}</div>
+                <div class="holding-weight">
+                    <span style="width: {{ stock.allocation_pct }}%"></span>
+                </div>
+                <div class="holding-change {% if stock.day_change_pct < 0 %}down{% endif %}">
+                    {{ "{:+.2f}%".format(stock.day_change_pct) }}
+                </div>
+            </a>
+            {% endfor %}
+            {% else %}
+            <div class="p-3 text-center text-muted">
+                <p class="mb-2" style="font-size: 0.85rem;">No holdings in your portfolio yet.</p>
+                <a href="{{ url_for('portfolio') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus"></i> Add Stocks
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </aside>
+
+    <div class="dashboard-panel allocation-panel">
+        <div class="panel-title-row">
+            <div>
+                <h4>Sector Allocation</h4>
+                <span>Active sector weights & diversification</span>
+            </div>
+            <a href="{{ url_for('portfolio') }}">Details <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        {% if allocation %}
+        <div class="allocation-content has-data">
+            <div class="allocation-donut-wrap">
+                <div class="allocation-donut" id="allocationDonut">
+                    <div class="donut-center">
+                        <strong>{{ allocation|length }}</strong>
+                        <span>Sectors</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sector-bars-list">
+                {% for sec in allocation[:4] %}
+                <div class="sector-bar-item">
+                    <div class="sector-bar-header">
+                        <div class="sector-name-badge">
+                            <span class="sector-dot sector-dot-{{ loop.index0 % 6 }}"></span>
+                            <strong>{{ sec.sector }}</strong>
+                        </div>
+                        <span class="sector-pct">{{ sec.percentage }}%</span>
+                    </div>
+                    <div class="progress-track" style="background: #F1F5F9; height: 6px; border-radius: 3px; overflow: hidden;">
+                        <div class="progress-fill sector-fill-{{ loop.index0 % 6 }}" style="width: {{ sec.percentage }}%; height: 100%; border-radius: 3px;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="allocation-empty-state">
+            <div class="empty-icon-circle">
+                <i class="bi bi-pie-chart-fill"></i>
+            </div>
+            <h5>No Sector Holdings</h5>
+            <p>Add stocks to your portfolio to view live sector diversification and allocation weights.</p>
+            <a href="{{ url_for('portfolio') }}" class="btn-empty-add-stock">
+                <i class="bi bi-plus-lg"></i>
+                <span>Add Stocks</span>
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="allocation-metrics">
+            {% if portfolio_summary.has_holdings %}
+            <div class="metric-chip">
+                <span class="metric-label">Concentration</span>
+                <strong class="metric-val">{{ portfolio_summary.risk_metrics.concentration }}</strong>
+            </div>
+            <div class="metric-chip">
+                <span class="metric-label">Health Score</span>
+                <strong class="metric-val text-primary-score">{{ portfolio_summary.health_score }}/100</strong>
+            </div>
+            <div class="metric-chip">
+                <span class="metric-label">Top Asset</span>
+                <strong class="metric-val">{{ portfolio_summary.risk_metrics.largest_holding_pct }}%</strong>
+            </div>
+            {% else %}
+            <div class="metric-chip">
+                <span class="metric-label">Status</span>
+                <strong class="metric-val status-ready"><i class="bi bi-circle-fill"></i> Ready</strong>
+            </div>
+            <div class="metric-chip">
+                <span class="metric-label">Diversification</span>
+                <strong class="metric-val status-pending">Pending</strong>
+            </div>
+            <div class="metric-chip">
+                <span class="metric-label">Risk Level</span>
+                <strong class="metric-val status-na">Awaiting Data</strong>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="dashboard-panel movers-panel">
+        <div class="panel-title-row">
+            <div>
+                <h4>Top Movers</h4>
+                <span>Gainers and losers</span>
+            </div>
+            <small>Today</small>
+        </div>
+
+        <div class="movers-grid">
+            <div>
+                <h5>Gainers</h5>
+                {% if top_gainers %}
+                {% for stock in top_gainers %}
+                <a href="{{ url_for('analysis') }}?symbol={{ stock.symbol }}" class="mover-item">
+                    <span>
+                        <strong>{{ stock.symbol }}</strong>
+                        <small>{{ stock.name }}</small>
+                    </span>
+                    <b class="{% if not stock.is_live %}offline{% endif %}">
+                        {% if stock.is_live %}{{ stock.change_percent }}{% else %}Offline{% endif %}
+                    </b>
+                </a>
+                {% endfor %}
+                {% else %}
+                <div class="mover-empty">No active gainers right now.</div>
+                {% endif %}
+            </div>
+
+            <div>
+                <h5 class="loser-title">Losers</h5>
+                {% if top_losers %}
+                {% for stock in top_losers %}
+                <a href="{{ url_for('analysis') }}?symbol={{ stock.symbol }}" class="mover-item {% if stock.change_value < 0 %}loser{% endif %}">
+                    <span>
+                        <strong>{{ stock.symbol }}</strong>
+                        <small>{{ stock.name }}</small>
+                    </span>
+                    <b class="{% if not stock.is_live %}offline{% endif %}">
+                        {% if stock.is_live %}{{ stock.change_percent }}{% else %}Offline{% endif %}
+                    </b>
+                </a>
+                {% endfor %}
+                {% else %}
+                <div class="mover-empty">No active losers right now.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-panel recommendations-panel">
+        <div class="panel-title-row">
+            <div>
+                <h4>Recommended Stocks</h4>
+                <span>AI Multi-Factor Top Picks</span>
+            </div>
+            <i class="bi bi-stars"></i>
+        </div>
+
+        <div class="recommendation-list">
+            {% for stock in recommended_stocks %}
+            <a href="{{ url_for('analysis') }}?symbol={{ stock.symbol }}" class="recommendation-item">
+                <div>
+                    <strong>{{ stock.symbol }}</strong>
+                    <span>{{ stock.name }}</span>
+                </div>
+                <div>
+                    <b>{{ stock.signal }}</b>
+                    <small class="{% if stock.change_value < 0 %}down{% endif %} {% if not stock.is_live %}offline{% endif %}">
+                        {% if stock.is_live %}{{ stock.change_percent }}{% else %}Offline{% endif %}
+                    </small>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="dashboard-panel news-card intelligence-panel">
+        <div class="card-header news-card-header">
+            <div>
+                <span class="news-section-label">Market Intelligence</span>
+                <h4>Latest Market News</h4>
+            </div>
+
+            <div class="live-news-badge">
+                <span class="live-dot"></span>
+                Live News
+            </div>
+        </div>
+
+        <div class="market-news-list">
+            {% if market_news %}
+            {% for article in market_news %}
+            <a href="{{ article.link }}" target="_blank" rel="noopener noreferrer" class="market-news-item">
+                <div class="news-icon">
+                    <i class="bi bi-newspaper"></i>
+                </div>
+
+                <div class="news-details">
+                    <div class="news-meta">
+                        <span class="news-source">{{ article.source }}</span>
+                        <span class="news-date">
+                            <i class="bi bi-clock"></i>
+                            {{ article.published }}
+                        </span>
+                    </div>
+
+                    <h5>{{ article.title }}</h5>
+                </div>
+
+                <div class="news-link-icon">
+                    <i class="bi bi-arrow-up-right"></i>
+                </div>
+            </a>
+            {% endfor %}
+            {% else %}
+            <div class="news-empty-state">
+                <i class="bi bi-wifi-off"></i>
+                <h5>Market news is unavailable</h5>
+                <p>Please refresh the dashboard after some time.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+</div>
+
+<button
+    type="button"
+    class="floating-chat-toggle"
+    id="askAiToggle"
+    aria-label="Open Stratix AI assistant"
+    aria-controls="askAiWidget"
+    aria-expanded="false"
+>
+    <i class="bi bi-chat-dots-fill"></i>
+    <span>Ask Stratix AI</span>
+</button>
+
+<section class="ask-ai-widget floating-chatbot" id="askAiWidget" aria-hidden="true">
+    <div class="ask-ai-top">
+        <div>
+            <span>Ask Stratix AI</span>
+            <strong>Stock AI Assistant</strong>
+        </div>
+        <div class="floating-chat-actions">
+            <i class="bi bi-stars"></i>
+            <button type="button" id="askAiClose" aria-label="Close chat">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="ask-ai-answer" id="askAiAnswer" aria-live="polite">
+        <div class="chat-message bot">
+            <i class="bi bi-lightning-charge"></i>
+            <span>Hello! Ask me about a stock, NIFTY 50, SENSEX, trends, or investment risks.</span>
+        </div>
+    </div>
+
+    <form id="askAiForm" class="ask-ai-input-row">
+        <input
+            type="text"
+            id="askAiQuestion"
+            placeholder="Ask a market question..."
+            autocomplete="off"
+            required
+        >
+        <button type="submit" title="Send message" aria-label="Send message">
+            <i class="bi bi-send"></i>
+        </button>
+    </form>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const donut = document.getElementById("allocationDonut");
+    if (donut) {
+        const sectorData = {{ allocation | default([], true) | tojson | safe }};
+        if (sectorData && sectorData.length > 0) {
+            const colors = ['#7c3aed', '#2563eb', '#10b981', '#f59e0b', '#ec4899', '#64748b'];
+            let currentPct = 0;
+            const segments = sectorData.slice(0, 6).map((sec, i) => {
+                const start = currentPct;
+                currentPct += parseFloat(sec.percentage) || 0;
+                const color = colors[i % colors.length];
+                return `${color} ${start}% ${currentPct}%`;
+            });
+            if (currentPct < 100) {
+                segments.push(`#f1f5f9 ${currentPct}% 100%`);
+            }
+            donut.style.background = `conic-gradient(${segments.join(', ')})`;
+        }
+    }
+});
+</script>
+{% endblock %}

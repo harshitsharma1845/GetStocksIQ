@@ -1,0 +1,451 @@
+/* ==========================================================================
+   Trading Platform Animated Loading Spinner - Dark Rich Purple Theme
+   Inspired by Dribbble: Trading platform loading spinner (Shot 4547788)
+   Features:
+     - High-contrast, rich deep purple palette for crisp readability on light & dark backgrounds
+     - Fluctuating animated candlestick bars with moving wicks & bodies
+     - Orbital glowing purple radar ring
+     - Ambient purple back-glow
+     - Variants: standard (md), compact (sm), large (lg), overlay
+   ========================================================================== */
+
+:root {
+    --tp-purple-primary: #7c3aed;       /* rich violet */
+    --tp-purple-vibrant: #6d28d9;       /* deep vibrant purple */
+    --tp-purple-neon: #8b5cf6;          /* medium electric purple */
+    --tp-purple-deep: #5b21b6;          /* dark royal purple */
+    --tp-purple-dark: #4c1d95;          /* deep bold purple */
+    --tp-purple-light: #6d28d9;         /* dark solid wick */
+    --tp-purple-glow: rgba(109, 40, 217, 0.45);
+    --tp-purple-glow-intense: rgba(124, 58, 237, 0.65);
+    --tp-purple-bg: rgba(20, 10, 35, 0.88);
+}
+
+/* ==========================================================================
+   Main Spinner Container
+   ========================================================================== */
+
+.trading-spinner-container {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 16px;
+    position: relative;
+    user-select: none;
+}
+
+.trading-spinner-container.is-centered {
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Fullscreen / Modal / Card Overlay */
+.trading-spinner-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--tp-purple-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    border-radius: inherit;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.trading-spinner-overlay.is-fixed {
+    position: fixed;
+    z-index: 9999;
+}
+
+/* ==========================================================================
+   Trading Spinner Core & Orbit Ring
+   ========================================================================== */
+
+.trading-spinner {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Glowing Rotating Orbit Ring */
+.trading-spinner-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    padding: 2.5px;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        rgba(109, 40, 217, 0.15) 25%,
+        var(--tp-purple-primary) 65%,
+        var(--tp-purple-deep) 100%
+    );
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 2.5px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 2.5px));
+    animation: tp-spin 1.4s linear infinite;
+    filter: drop-shadow(0 0 8px var(--tp-purple-glow));
+}
+
+.trading-spinner-ring::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: 14px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #7c3aed;
+    box-shadow: 0 0 8px 2px var(--tp-purple-neon), 0 0 16px 3px var(--tp-purple-vibrant);
+}
+
+/* Ambient Radial Back-Glow */
+.trading-spinner-glow {
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(109, 40, 217, 0.3) 0%, rgba(91, 33, 182, 0.12) 55%, transparent 75%);
+    animation: tp-pulse-glow 2s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   Animated Candlestick Bars
+   ========================================================================== */
+
+.trading-spinner-bars {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 40px;
+    position: relative;
+    z-index: 2;
+}
+
+.candlestick {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 6px;
+    height: 36px;
+}
+
+/* Candle Wick (Upper & Lower Line) */
+.candlestick .wick {
+    position: absolute;
+    width: 1.5px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--tp-purple-vibrant), var(--tp-purple-deep));
+    border-radius: 1px;
+    opacity: 0.95;
+}
+
+/* Candle Real Body */
+.candlestick .body {
+    position: relative;
+    width: 6px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, var(--tp-purple-primary) 0%, var(--tp-purple-deep) 100%);
+    box-shadow: 0 0 6px var(--tp-purple-glow);
+    z-index: 1;
+}
+
+/* Individual Candlestick Fluctuations */
+.candlestick.c1 .body {
+    height: 14px;
+    background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 100%);
+    animation: tp-candle-1 1.6s ease-in-out infinite;
+}
+.candlestick.c2 .body {
+    height: 22px;
+    background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%);
+    animation: tp-candle-2 1.6s ease-in-out infinite 0.2s;
+}
+.candlestick.c3 .body {
+    height: 18px;
+    background: linear-gradient(180deg, #6d28d9 0%, #4c1d95 100%);
+    box-shadow: 0 0 10px var(--tp-purple-glow-intense);
+    animation: tp-candle-3 1.6s ease-in-out infinite 0.4s;
+}
+.candlestick.c4 .body {
+    height: 24px;
+    background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 100%);
+    animation: tp-candle-4 1.6s ease-in-out infinite 0.6s;
+}
+.candlestick.c5 .body {
+    height: 16px;
+    background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%);
+    animation: tp-candle-5 1.6s ease-in-out infinite 0.8s;
+}
+
+/* Trend Sparkline Wave at bottom of spinner */
+.trading-spinner-wave {
+    position: absolute;
+    bottom: 8px;
+    width: 44px;
+    height: 12px;
+    opacity: 0.6;
+}
+
+.trading-spinner-wave path {
+    stroke: var(--tp-purple-primary);
+    stroke-width: 1.5;
+    fill: none;
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    animation: tp-wave-draw 2s linear infinite;
+    filter: drop-shadow(0 0 4px var(--tp-purple-glow));
+}
+
+/* ==========================================================================
+   Spinner Text Label - High Contrast Dark Purple Gradient
+   ========================================================================== */
+
+.trading-spinner-label {
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #5b21b6;
+    animation: tp-text-pulse 2s ease-in-out infinite;
+    text-align: center;
+    font-family: var(--font-number, "IBM Plex Mono", monospace);
+}
+
+.trading-spinner-subtext {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6d28d9;
+    opacity: 0.95;
+    margin-top: -8px;
+    text-align: center;
+}
+
+/* ==========================================================================
+   Size Variants: Compact (sm), Large (lg)
+   ========================================================================== */
+
+/* Compact / Inline for Buttons & Dropdowns */
+.trading-spinner-container.trading-spinner-sm {
+    padding: 4px;
+    gap: 8px;
+    flex-direction: row;
+}
+
+.trading-spinner-sm .trading-spinner {
+    width: 28px;
+    height: 28px;
+}
+
+.trading-spinner-sm .trading-spinner-ring {
+    padding: 1.5px;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        rgba(109, 40, 217, 0.2) 25%,
+        var(--tp-purple-primary) 65%,
+        var(--tp-purple-deep) 100%
+    );
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #fff calc(100% - 1.5px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #fff calc(100% - 1.5px));
+}
+
+.trading-spinner-sm .trading-spinner-ring::after {
+    top: -1px;
+    right: 4px;
+    width: 4px;
+    height: 4px;
+    background: #6d28d9;
+}
+
+.trading-spinner-sm .trading-spinner-bars {
+    gap: 3px;
+    height: 18px;
+}
+
+.trading-spinner-sm .candlestick {
+    width: 3px;
+    height: 16px;
+}
+
+.trading-spinner-sm .candlestick .wick {
+    width: 1px;
+    background: #5b21b6;
+}
+
+.trading-spinner-sm .candlestick .body {
+    width: 3px;
+    border-radius: 1px;
+}
+
+.trading-spinner-sm .candlestick.c1 .body { height: 6px; background: #6d28d9; }
+.trading-spinner-sm .candlestick.c2 .body { height: 10px; background: #7c3aed; }
+.trading-spinner-sm .candlestick.c3 .body { height: 8px; background: #4c1d95; }
+.trading-spinner-sm .candlestick.c4,
+.trading-spinner-sm .candlestick.c5 { display: none; }
+
+.trading-spinner-sm .trading-spinner-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #5b21b6;
+}
+
+/* Large Hero / Fullscreen Variant */
+.trading-spinner-lg .trading-spinner {
+    width: 104px;
+    height: 104px;
+}
+
+.trading-spinner-lg .trading-spinner-bars {
+    gap: 8px;
+    height: 56px;
+}
+
+.trading-spinner-lg .candlestick {
+    width: 8px;
+    height: 52px;
+}
+
+.trading-spinner-lg .candlestick .wick {
+    width: 2px;
+}
+
+.trading-spinner-lg .candlestick .body {
+    width: 8px;
+    border-radius: 3px;
+}
+
+.trading-spinner-lg .trading-spinner-label {
+    font-size: 1rem;
+}
+
+/* ==========================================================================
+   Keyframe Animations
+   ========================================================================== */
+
+@keyframes tp-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes tp-pulse-glow {
+    0% {
+        opacity: 0.5;
+        transform: scale(0.92);
+    }
+    100% {
+        opacity: 0.95;
+        transform: scale(1.08);
+    }
+}
+
+@keyframes tp-text-pulse {
+    0%, 100% {
+        opacity: 0.85;
+        filter: brightness(1);
+    }
+    50% {
+        opacity: 1;
+        filter: brightness(1.15) drop-shadow(0 0 4px var(--tp-purple-glow));
+    }
+}
+
+@keyframes tp-wave-draw {
+    0% { stroke-dashoffset: 40; }
+    50% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -40; }
+}
+
+/* Realistic Market Volatility Fluctuations for Each Candle */
+@keyframes tp-candle-1 {
+    0%, 100% {
+        height: 10px;
+        transform: translateY(2px);
+    }
+    30% {
+        height: 22px;
+        transform: translateY(-4px);
+    }
+    70% {
+        height: 14px;
+        transform: translateY(1px);
+    }
+}
+
+@keyframes tp-candle-2 {
+    0%, 100% {
+        height: 24px;
+        transform: translateY(-3px);
+    }
+    40% {
+        height: 12px;
+        transform: translateY(3px);
+    }
+    80% {
+        height: 20px;
+        transform: translateY(-2px);
+    }
+}
+
+@keyframes tp-candle-3 {
+    0%, 100% {
+        height: 16px;
+        transform: translateY(0px);
+    }
+    25% {
+        height: 28px;
+        transform: translateY(-6px);
+    }
+    60% {
+        height: 10px;
+        transform: translateY(4px);
+    }
+    85% {
+        height: 22px;
+        transform: translateY(-3px);
+    }
+}
+
+@keyframes tp-candle-4 {
+    0%, 100% {
+        height: 14px;
+        transform: translateY(2px);
+    }
+    35% {
+        height: 26px;
+        transform: translateY(-5px);
+    }
+    75% {
+        height: 18px;
+        transform: translateY(-1px);
+    }
+}
+
+@keyframes tp-candle-5 {
+    0%, 100% {
+        height: 20px;
+        transform: translateY(-2px);
+    }
+    50% {
+        height: 8px;
+        transform: translateY(4px);
+    }
+    80% {
+        height: 22px;
+        transform: translateY(-4px);
+    }
+}

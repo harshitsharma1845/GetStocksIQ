@@ -1,0 +1,1030 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/compare.css') }}">
+{% endblock %}
+
+{% block title %}
+Stock Comparison — {% for stock in stocks %}{{ stock.symbol }}{% if not loop.last %} vs {% endif %}{% endfor %}
+{% endblock %}
+
+{% block content %}
+
+<div class="comparison-results-page">
+
+    <!-- ==========================================
+         BREADCRUMB & HEADER
+    =========================================== -->
+    <nav class="results-breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Home</a>
+        <i class="bi bi-chevron-right"></i>
+        <a href="{{ url_for('compare') }}">Compare Stocks</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>
+            {% for stock in stocks %}
+            {{ stock.symbol }}{% if not loop.last %} vs {% endif %}
+            {% endfor %}
+        </span>
+    </nav>
+
+    <header class="comparison-page-header">
+        <div class="header-main-content">
+            <div class="header-titles">
+                <div class="header-badge-row">
+                    <span class="compare-badge"><i class="bi bi-bar-chart-steps"></i> Multi-Stock Comparison</span>
+                    <span class="comparison-updated-date"><i class="bi bi-clock"></i> Updated {{ current_date | default("Today") }}</span>
+                </div>
+                <h1>
+                    {% for stock in stocks %}
+                    <span class="header-stock-name">{{ stock.symbol }}</span>{% if not loop.last %}<span class="header-vs">vs</span>{% endif %}
+                    {% endfor %}
+                </h1>
+                <p class="header-subtitle">
+                    Compare market performance, valuation multiples, financial health, and company fundamentals side-by-side.
+                </p>
+            </div>
+
+            <!-- STOCK CONTROLS / CHIPS -->
+            <div class="comparison-controls-card">
+                <div class="controls-label">
+                    <span>Comparing ({{ stocks|length }}/3)</span>
+                </div>
+                <div class="selected-stock-chips">
+                    {% for stock in stocks %}
+                    <div class="stock-chip" data-symbol="{{ stock.symbol }}">
+                        <div class="chip-avatar">{{ stock.symbol[0] }}</div>
+                        <div class="chip-details">
+                            <strong>{{ stock.symbol }}</strong>
+                            <span>
+                                {% if stock.price != "N/A" %}
+                                ₹{{ "{:,.2f}".format(stock.price | float) }}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </span>
+                        </div>
+                        <button type="button" class="remove-chip-btn" onclick="removeStockFromComparison('{{ stock.symbol }}')" title="Remove {{ stock.symbol }}" aria-label="Remove {{ stock.symbol }}">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+
+                    {% if stocks|length < 3 %}
+                    <button type="button" class="add-chip-btn" onclick="openAddStockModal()" title="Add another stock to compare">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Add Stock</span>
+                    </button>
+                    {% endif %}
+
+                    <a href="{{ url_for('compare') }}" class="edit-comparison-btn" title="Start a fresh comparison">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span>Change</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==========================================
+         1. QUICK COMPARISON (SUMMARY CARDS)
+    =========================================== -->
+    <section class="summary-cards-section" aria-label="Quick Comparison Summary">
+        <div class="section-title-row">
+            <div>
+                <span class="section-eyebrow">Overview</span>
+                <h2>Quick Comparison</h2>
+            </div>
+        </div>
+
+        <div class="summary-cards-grid grid-cols-{{ stocks|length }}">
+            {% for stock in stocks %}
+            <div class="summary-stock-card">
+                <div class="summary-card-header">
+                    <div class="summary-brand">
+                        <div class="summary-logo-icon">{{ stock.symbol[0] }}</div>
+                        <div class="summary-brand-info">
+                            <h3>{{ stock.name }}</h3>
+                            <div class="summary-tags">
+                                <span class="ticker-tag">{{ stock.symbol }}</span>
+                                {% if stock.sector != "N/A" %}
+                                <span class="sector-tag">{{ stock.sector }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-price-block">
+                    <div class="price-value-row">
+                        <span class="current-price-label">Current Price</span>
+                        <strong class="summary-price">
+                            {% if stock.price != "N/A" %}
+                            ₹{{ "{:,.2f}".format(stock.price | float) }}
+                            {% else %}
+                            <span class="na-pill">N/A</span>
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <span class="price-exchange-tag">NSE • Real-time Data</span>
+                </div>
+
+                <div class="summary-metric-stats">
+                    <div class="metric-stat-item">
+                        <span class="stat-name">P/E Ratio</span>
+                        <strong class="stat-val">
+                            {% if stock.pe_ratio != "N/A" %}
+                            {{ "%.2f" | format(stock.pe_ratio | float) }}
+                            {% else %}
+                            <span class="na-pill">N/A</span>
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div class="metric-stat-item">
+                        <span class="stat-name">Market Cap</span>
+                        <strong class="stat-val">
+                            {% if stock.market_cap != "N/A" %}
+                            ₹{{ "%.0f" | format((stock.market_cap | float) / 10000000) }} Cr
+                            {% else %}
+                            <span class="na-pill">N/A</span>
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div class="metric-stat-item">
+                        <span class="stat-name">EPS</span>
+                        <strong class="stat-val">
+                            {% if stock.eps != "N/A" %}
+                            ₹{{ "%.2f" | format(stock.eps | float) }}
+                            {% else %}
+                            <span class="na-pill">N/A</span>
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="summary-card-footer">
+                    <a href="/analysis?symbol={{ stock.symbol }}" class="card-detail-link">
+                        <span>Full Analysis</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- ==========================================
+         2. COMPARISON MATRIX (SIDE-BY-SIDE TABLE)
+    =========================================== -->
+    <section class="comparison-matrix-section" aria-label="Key Highlights Comparison Matrix">
+        <div class="section-title-row">
+            <div>
+                <span class="section-eyebrow">Metrics Table</span>
+                <h2>Comparison Matrix</h2>
+            </div>
+            <span class="table-scroll-hint"><i class="bi bi-arrows-expand"></i> Scroll horizontally on small screens</span>
+        </div>
+
+        <div class="matrix-table-card">
+            <div class="table-responsive-wrapper">
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th class="metric-col-header">Financial Metric</th>
+                            {% for stock in stocks %}
+                            <th class="stock-col-header">
+                                <div class="stock-header-cell">
+                                    <div class="cell-logo">{{ stock.symbol[0] }}</div>
+                                    <div>
+                                        <strong>{{ stock.symbol }}</strong>
+                                        <span>{{ stock.name }}</span>
+                                    </div>
+                                </div>
+                            </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="metric-title-cell">
+                                <i class="bi bi-currency-rupee metric-icon"></i>
+                                <span>Current Price</span>
+                            </td>
+                            {% for stock in stocks %}
+                            <td class="stock-data-cell font-semibold">
+                                {% if stock.price != "N/A" %}
+                                ₹{{ "{:,.2f}".format(stock.price | float) }}
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="metric-title-cell">
+                                <i class="bi bi-buildings metric-icon"></i>
+                                <span>Market Capitalization</span>
+                            </td>
+                            {% for stock in stocks %}
+                            <td class="stock-data-cell">
+                                {% if stock.market_cap != "N/A" %}
+                                ₹{{ "{:,.2f}".format((stock.market_cap | float) / 10000000) }} Cr
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="metric-title-cell">
+                                <i class="bi bi-pie-chart metric-icon"></i>
+                                <span>P/E Ratio (Valuation)</span>
+                            </td>
+                            {% for stock in stocks %}
+                            <td class="stock-data-cell">
+                                {% if stock.pe_ratio != "N/A" %}
+                                {{ "%.2f" | format(stock.pe_ratio | float) }}
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="metric-title-cell">
+                                <i class="bi bi-graph-up-arrow metric-icon"></i>
+                                <span>Earnings Per Share (EPS)</span>
+                            </td>
+                            {% for stock in stocks %}
+                            <td class="stock-data-cell">
+                                {% if stock.eps != "N/A" %}
+                                ₹{{ "%.2f" | format(stock.eps | float) }}
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="metric-title-cell">
+                                <i class="bi bi-cash-stack metric-icon"></i>
+                                <span>Revenue</span>
+                            </td>
+                            {% for stock in stocks %}
+                            <td class="stock-data-cell">
+                                {% if stock.revenue != "N/A" %}
+                                ₹{{ "{:,.2f}".format((stock.revenue | float) / 10000000) }} Cr
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="metric-title-cell">
+                                <i class="bi bi-arrow-repeat metric-icon"></i>
+                                <span>Return on Equity (ROE)</span>
+                            </td>
+                            {% for stock in stocks %}
+                            <td class="stock-data-cell">
+                                {% if stock.roe != "N/A" %}
+                                {{ "%.2f" | format((stock.roe | float) * 100) }}%
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="metric-title-cell">
+                                <i class="bi bi-gift metric-icon"></i>
+                                <span>Dividend Yield</span>
+                            </td>
+                            {% for stock in stocks %}
+                            <td class="stock-data-cell">
+                                {% if stock.dividend_yield != "N/A" %}
+                                {{ "%.2f" | format(stock.dividend_yield | float) }}%
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="metric-title-cell">
+                                <i class="bi bi-grid metric-icon"></i>
+                                <span>Sector</span>
+                            </td>
+                            {% for stock in stocks %}
+                            <td class="stock-data-cell">
+                                {% if stock.sector != "N/A" %}
+                                <span class="sector-badge">{{ stock.sector }}</span>
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="metric-title-cell">
+                                <i class="bi bi-briefcase metric-icon"></i>
+                                <span>Industry</span>
+                            </td>
+                            {% for stock in stocks %}
+                            <td class="stock-data-cell">
+                                {% if stock.industry != "N/A" %}
+                                {{ stock.industry }}
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         3. LIVE MARKET & HISTORICAL CHARTS SECTION
+    =========================================== -->
+    <div class="charts-comparison-grid">
+
+        <!-- LIVE SHARE PRICE COMPARISON -->
+        <section class="comparison-panel live-market-panel" aria-label="Share Price Comparison">
+            <div class="comparison-panel-heading">
+                <div>
+                    <span class="panel-label">Live Market</span>
+                    <h2>Share Price</h2>
+                </div>
+                <div class="panel-icon"><i class="bi bi-bar-chart-fill"></i></div>
+            </div>
+            <p class="panel-description">Current trading price comparison across selected companies.</p>
+
+            <div class="live-price-bars-list">
+                {% for stock in stocks %}
+                <div class="live-price-row">
+                    <div class="price-row-header">
+                        <div class="stock-meta">
+                            <span class="stock-meta-symbol">{{ stock.symbol }}</span>
+                            <span class="stock-meta-name">{{ stock.name }}</span>
+                        </div>
+                        <strong class="stock-meta-price">
+                            {% if stock.price != "N/A" %}
+                            ₹{{ "{:,.2f}".format(stock.price | float) }}
+                            {% else %}
+                            <span class="na-pill">N/A</span>
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div class="price-bar-track">
+                        <div class="price-bar-fill dynamic-live-bar"
+                             data-price="{{ stock.price if stock.price != 'N/A' else 0 }}">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="chart-footer-note">
+                <i class="bi bi-info-circle"></i>
+                <span>All prices in Indian Rupees (INR) from National Stock Exchange.</span>
+            </div>
+        </section>
+
+        <!-- HISTORICAL SHARE PRICES CHART -->
+        <section class="comparison-panel historical-panel" aria-label="Historical Share Prices">
+            <div class="comparison-panel-heading">
+                <div>
+                    <span class="panel-label">Performance</span>
+                    <h2>Historical Share Prices</h2>
+                </div>
+                <!-- CHART PERIOD BUTTONS -->
+                <div class="chart-period-buttons" role="group" aria-label="Chart timeframe selection">
+                    <button type="button" data-period="1M">1M</button>
+                    <button type="button" data-period="6M">6M</button>
+                    <button type="button" class="active" data-period="1Y">1Y</button>
+                    <button type="button" data-period="3Y">3Y</button>
+                    <button type="button" data-period="5Y">5Y</button>
+                </div>
+            </div>
+
+            <div class="historical-chart-container">
+                <canvas id="historicalPriceChart"></canvas>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ==========================================
+         4. FINANCIAL FUNDAMENTALS (2-COLUMN GRID)
+    =========================================== -->
+    <section class="financial-fundamentals-section" aria-label="Financial Fundamentals Analysis">
+        <div class="section-title-row">
+            <div>
+                <span class="section-eyebrow">Financial Analysis</span>
+                <h2>Company Fundamentals</h2>
+            </div>
+            <p class="section-subtitle">Side-by-side valuation, earnings, profitability, and capital efficiency comparisons.</p>
+        </div>
+
+        <div class="fundamentals-2col-grid">
+
+            <!-- 1. P/E RATIO -->
+            <div class="comparison-panel fundamental-metric-card">
+                <div class="fundamental-card-header">
+                    <div class="metric-badge-title">
+                        <div class="metric-icon-box"><i class="bi bi-pie-chart-fill"></i></div>
+                        <div>
+                            <span class="metric-category">Valuation Multiple</span>
+                            <h3>P/E Ratio</h3>
+                        </div>
+                    </div>
+                    <span class="metric-info-tooltip" title="Price to Earnings ratio indicates company valuation relative to profits"><i class="bi bi-info-circle"></i></span>
+                </div>
+
+                <div class="fundamental-bars-list">
+                    {% for stock in stocks %}
+                    <div class="fundamental-bar-row">
+                        <div class="bar-row-info">
+                            <span class="bar-symbol">{{ stock.symbol }}</span>
+                            <strong class="bar-value">
+                                {% if stock.pe_ratio != "N/A" %}
+                                {{ "%.2f" | format(stock.pe_ratio | float) }}
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </strong>
+                        </div>
+                        <div class="fundamental-bar-track">
+                            <div class="fundamental-bar-fill dynamic-fundamental-bar"
+                                 data-metric="pe"
+                                 data-value="{{ stock.pe_ratio if stock.pe_ratio != 'N/A' else 0 }}">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 2. MARKET CAPITALIZATION -->
+            <div class="comparison-panel fundamental-metric-card">
+                <div class="fundamental-card-header">
+                    <div class="metric-badge-title">
+                        <div class="metric-icon-box"><i class="bi bi-buildings-fill"></i></div>
+                        <div>
+                            <span class="metric-category">Company Size</span>
+                            <h3>Market Capitalization</h3>
+                        </div>
+                    </div>
+                    <span class="metric-info-tooltip" title="Total market value of the company's outstanding shares"><i class="bi bi-info-circle"></i></span>
+                </div>
+
+                <div class="fundamental-bars-list">
+                    {% for stock in stocks %}
+                    <div class="fundamental-bar-row">
+                        <div class="bar-row-info">
+                            <span class="bar-symbol">{{ stock.symbol }}</span>
+                            <strong class="bar-value">
+                                {% if stock.market_cap != "N/A" %}
+                                ₹{{ "%.0f" | format((stock.market_cap | float) / 10000000) }} Cr
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </strong>
+                        </div>
+                        <div class="fundamental-bar-track">
+                            <div class="fundamental-bar-fill dynamic-fundamental-bar"
+                                 data-metric="mcap"
+                                 data-value="{{ stock.market_cap if stock.market_cap != 'N/A' else 0 }}">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 3. REVENUE -->
+            <div class="comparison-panel fundamental-metric-card">
+                <div class="fundamental-card-header">
+                    <div class="metric-badge-title">
+                        <div class="metric-icon-box"><i class="bi bi-cash-stack"></i></div>
+                        <div>
+                            <span class="metric-category">Financial Scale</span>
+                            <h3>Total Revenue</h3>
+                        </div>
+                    </div>
+                    <span class="metric-info-tooltip" title="Total revenue generated by the company over the trailing period"><i class="bi bi-info-circle"></i></span>
+                </div>
+
+                <div class="fundamental-bars-list">
+                    {% for stock in stocks %}
+                    <div class="fundamental-bar-row">
+                        <div class="bar-row-info">
+                            <span class="bar-symbol">{{ stock.symbol }}</span>
+                            <strong class="bar-value">
+                                {% if stock.revenue != "N/A" %}
+                                ₹{{ "%.0f" | format((stock.revenue | float) / 10000000) }} Cr
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </strong>
+                        </div>
+                        <div class="fundamental-bar-track">
+                            <div class="fundamental-bar-fill dynamic-fundamental-bar"
+                                 data-metric="revenue"
+                                 data-value="{{ stock.revenue if stock.revenue != 'N/A' else 0 }}">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 4. RETURN ON EQUITY (ROE) -->
+            <div class="comparison-panel fundamental-metric-card">
+                <div class="fundamental-card-header">
+                    <div class="metric-badge-title">
+                        <div class="metric-icon-box"><i class="bi bi-graph-up"></i></div>
+                        <div>
+                            <span class="metric-category">Profitability Efficiency</span>
+                            <h3>Return on Equity (ROE)</h3>
+                        </div>
+                    </div>
+                    <span class="metric-info-tooltip" title="Measures how efficiently management generates profits from shareholders equity"><i class="bi bi-info-circle"></i></span>
+                </div>
+
+                <div class="fundamental-bars-list">
+                    {% for stock in stocks %}
+                    <div class="fundamental-bar-row">
+                        <div class="bar-row-info">
+                            <span class="bar-symbol">{{ stock.symbol }}</span>
+                            <strong class="bar-value">
+                                {% if stock.roe != "N/A" %}
+                                {{ "%.2f" | format((stock.roe | float) * 100) }}%
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </strong>
+                        </div>
+                        <div class="fundamental-bar-track">
+                            <div class="fundamental-bar-fill dynamic-fundamental-bar"
+                                 data-metric="roe"
+                                 data-value="{{ (stock.roe | float * 100) if stock.roe != 'N/A' else 0 }}">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 5. EARNINGS PER SHARE (EPS) -->
+            <div class="comparison-panel fundamental-metric-card">
+                <div class="fundamental-card-header">
+                    <div class="metric-badge-title">
+                        <div class="metric-icon-box"><i class="bi bi-wallet2"></i></div>
+                        <div>
+                            <span class="metric-category">Earnings Power</span>
+                            <h3>Earnings Per Share (EPS)</h3>
+                        </div>
+                    </div>
+                    <span class="metric-info-tooltip" title="Net income divided by the number of outstanding shares"><i class="bi bi-info-circle"></i></span>
+                </div>
+
+                <div class="fundamental-bars-list">
+                    {% for stock in stocks %}
+                    <div class="fundamental-bar-row">
+                        <div class="bar-row-info">
+                            <span class="bar-symbol">{{ stock.symbol }}</span>
+                            <strong class="bar-value">
+                                {% if stock.eps != "N/A" %}
+                                ₹{{ "%.2f" | format(stock.eps | float) }}
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </strong>
+                        </div>
+                        <div class="fundamental-bar-track">
+                            <div class="fundamental-bar-fill dynamic-fundamental-bar"
+                                 data-metric="eps"
+                                 data-value="{{ stock.eps if stock.eps != 'N/A' else 0 }}">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 6. DIVIDEND YIELD -->
+            <div class="comparison-panel fundamental-metric-card">
+                <div class="fundamental-card-header">
+                    <div class="metric-badge-title">
+                        <div class="metric-icon-box"><i class="bi bi-gift-fill"></i></div>
+                        <div>
+                            <span class="metric-category">Shareholder Yield</span>
+                            <h3>Dividend Yield</h3>
+                        </div>
+                    </div>
+                    <span class="metric-info-tooltip" title="Annual dividend payout relative to current share price"><i class="bi bi-info-circle"></i></span>
+                </div>
+
+                <div class="fundamental-bars-list">
+                    {% for stock in stocks %}
+                    <div class="fundamental-bar-row">
+                        <div class="bar-row-info">
+                            <span class="bar-symbol">{{ stock.symbol }}</span>
+                            <strong class="bar-value">
+                                {% if stock.dividend_yield != "N/A" %}
+                                {{ "%.2f" | format(stock.dividend_yield | float) }}%
+                                {% else %}
+                                <span class="na-pill">N/A</span>
+                                {% endif %}
+                            </strong>
+                        </div>
+                        <div class="fundamental-bar-track">
+                            <div class="fundamental-bar-fill dynamic-fundamental-bar"
+                                 data-metric="dividend"
+                                 data-value="{{ stock.dividend_yield if stock.dividend_yield != 'N/A' else 0 }}">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ==========================================
+         5. ABOUT THE COMPANIES (PROFILES)
+    =========================================== -->
+    <section class="company-information-section" aria-label="About the Companies">
+        <div class="section-title-row">
+            <div>
+                <span class="section-eyebrow">Company Profiles</span>
+                <h2>About the Companies</h2>
+            </div>
+        </div>
+
+        <div class="company-profiles-grid grid-cols-{{ stocks|length }}">
+            {% for stock in stocks %}
+            <article class="comparison-panel company-profile-card">
+                <div class="company-profile-top">
+                    <div class="profile-avatar-circle">{{ stock.symbol[0] }}</div>
+                    <div class="profile-company-headings">
+                        <h3>{{ stock.name }}</h3>
+                        <div class="profile-subtags">
+                            <span class="symbol-pill">{{ stock.symbol }}</span>
+                            {% if stock.sector != "N/A" %}
+                            <span class="sector-pill">{{ stock.sector }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="company-profile-description">
+                    <p>{{ stock.description }}</p>
+                </div>
+
+                <div class="company-profile-footer">
+                    <div class="profile-industry-tag">
+                        <i class="bi bi-building"></i>
+                        <span>{{ stock.industry if stock.industry != 'N/A' else 'General Industry' }}</span>
+                    </div>
+
+                    {% if stock.website != "N/A" %}
+                    <a href="{{ stock.website }}" target="_blank" rel="noopener noreferrer" class="visit-website-link">
+                        <span>Visit Website</span>
+                        <i class="bi bi-arrow-up-right"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+</div>
+
+<!-- ==========================================
+     INTERACTIVE ADD STOCK MODAL (RESULTS PAGE)
+=========================================== -->
+<div class="compare-stock-modal" id="addStockModal" aria-hidden="true" role="dialog">
+    <div class="compare-modal-overlay" onclick="closeAddStockModal()"></div>
+    <div class="compare-modal-content">
+        <div class="compare-modal-header">
+            <div>
+                <h2>Add Stock to Comparison</h2>
+                <p>Search by ticker or company name to add up to 3 stocks.</p>
+            </div>
+            <button type="button" class="close-compare-modal" onclick="closeAddStockModal()" aria-label="Close search modal">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="compare-search-wrapper">
+            <i class="bi bi-search"></i>
+            <input type="text" id="addStockSearchInput" placeholder="Search NSE stocks (e.g. RELIANCE, INFY)..." autocomplete="off">
+        </div>
+
+        <div class="compare-search-status" id="addStockSearchStatus">
+            Type at least 2 characters to search.
+        </div>
+
+        <div class="compare-search-results" id="addStockSearchResults"></div>
+    </div>
+</div>
+
+<!-- ==========================================
+     SCRIPTS & CHART INITIALIZATION
+=========================================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="historical-chart-data" type="application/json">
+    {{ chart_data | default({}, true) | tojson }}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // 1. DYNAMIC HORIZONTAL BARS FOR LIVE PRICES
+    const liveBars = Array.from(document.querySelectorAll(".dynamic-live-bar"));
+    if (liveBars.length > 0) {
+        const prices = liveBars.map(bar => {
+            const val = parseFloat(bar.dataset.price);
+            return Number.isFinite(val) && val > 0 ? val : 0;
+        });
+        const maxPrice = Math.max(...prices, 0);
+        liveBars.forEach((bar, idx) => {
+            const p = prices[idx];
+            if (maxPrice <= 0 || p <= 0) {
+                bar.style.width = "4%";
+            } else {
+                const widthPercent = Math.max(6, (p / maxPrice) * 100);
+                bar.style.width = widthPercent.toFixed(1) + "%";
+            }
+        });
+    }
+
+    // 2. DYNAMIC HORIZONTAL BARS FOR FUNDAMENTALS
+    document.querySelectorAll(".fundamental-metric-card").forEach(card => {
+        const bars = Array.from(card.querySelectorAll(".dynamic-fundamental-bar"));
+        const values = bars.map(bar => {
+            const val = parseFloat(bar.dataset.value);
+            return Number.isFinite(val) && val > 0 ? val : 0;
+        });
+        const maxVal = Math.max(...values, 0);
+        bars.forEach((bar, idx) => {
+            const val = values[idx];
+            if (maxVal <= 0 || val <= 0) {
+                bar.style.width = "4%";
+            } else {
+                const widthPercent = Math.max(6, (val / maxVal) * 100);
+                bar.style.width = widthPercent.toFixed(1) + "%";
+            }
+        });
+    });
+
+    // 3. HISTORICAL MULTI-SERIES CHART.JS CONFIGURATION
+    if (typeof Chart === "undefined") {
+        console.error("Chart.js failed to load.");
+        return;
+    }
+
+    const chartDataElement = document.getElementById("historical-chart-data");
+    const historicalData = chartDataElement ? JSON.parse(chartDataElement.textContent) : {};
+    const chartCanvas = document.getElementById("historicalPriceChart");
+
+    if (!chartCanvas) return;
+
+    // Elegant, accessible color palette for compared stocks
+    const chartColors = ["#7c3aed", "#2563eb", "#059669"];
+    let selectedPeriod = "1Y";
+
+    function createDatasets(period) {
+        const periodStocks = historicalData[period] || [];
+
+        return periodStocks.map(function (stock, index) {
+            const dates = stock.dates || [];
+            const prices = stock.prices || [];
+            const color = chartColors[index % chartColors.length];
+
+            return {
+                label: stock.symbol,
+                data: dates.map(function (date, i) {
+                    return {
+                        x: new Date(date + "T00:00:00").getTime(),
+                        y: Number(prices[i])
+                    };
+                }).filter(function (point) {
+                    return Number.isFinite(point.x) && Number.isFinite(point.y);
+                }).sort(function (a, b) {
+                    return a.x - b.x;
+                }),
+                borderColor: color,
+                backgroundColor: color,
+                borderWidth: 2.2,
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: color,
+                pointHoverBorderColor: "#ffffff",
+                pointHoverBorderWidth: 2,
+                tension: 0.2,
+                fill: false,
+                parsing: false
+            };
+        });
+    }
+
+    const historicalChart = new Chart(chartCanvas, {
+        type: "line",
+        data: {
+            datasets: createDatasets(selectedPeriod)
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: "bottom",
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: "circle",
+                        padding: 20,
+                        font: { family: "Poppins", size: 12, weight: "500" },
+                        color: "#475569"
+                    }
+                },
+                tooltip: {
+                    backgroundColor: "rgba(15, 23, 42, 0.92)",
+                    titleFont: { family: "Poppins", size: 12, weight: "600" },
+                    bodyFont: { family: "Poppins", size: 12 },
+                    padding: 10,
+                    cornerRadius: 8,
+                    callbacks: {
+                        title: function(items) {
+                            if (!items.length) return "";
+                            const d = new Date(Number(items[0].parsed.x));
+                            return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+                        },
+                        label: function (context) {
+                            return " " + context.dataset.label + ": ₹" +
+                                Number(context.parsed.y).toLocaleString("en-IN", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: "linear",
+                    grid: { display: false },
+                    ticks: {
+                        maxTicksLimit: 7,
+                        maxRotation: 0,
+                        callback: function (value) {
+                            const date = new Date(Number(value));
+                            return date.toLocaleDateString(
+                                "en-IN",
+                                selectedPeriod === "1M"
+                                    ? { day: "2-digit", month: "short" }
+                                    : { month: "short", year: "2-digit" }
+                            );
+                        },
+                        font: { family: "Poppins", size: 11 },
+                        color: "#94a3b8"
+                    }
+                },
+                y: {
+                    beginAtZero: false,
+                    grid: { color: "#f1f5f9" },
+                    ticks: {
+                        callback: function (value) {
+                            return "₹" + Number(value).toLocaleString("en-IN");
+                        },
+                        font: { family: "Poppins", size: 11 },
+                        color: "#94a3b8"
+                    }
+                }
+            }
+        }
+    });
+
+    const periodButtons = document.querySelectorAll(".chart-period-buttons button");
+    periodButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            selectedPeriod = button.dataset.period;
+            periodButtons.forEach(btn => btn.classList.remove("active"));
+            button.classList.add("active");
+            historicalChart.data.datasets = createDatasets(selectedPeriod);
+            historicalChart.update();
+        });
+    });
+});
+
+// 4. INTERACTIVE STOCK REMOVAL & ADDITION LOGIC
+const currentSymbols = [{% for stock in stocks %}"{{ stock.symbol }}"{% if not loop.last %},{% endif %}{% endfor %}];
+
+function removeStockFromComparison(symbolToRemove) {
+    const remaining = currentSymbols.filter(s => s !== symbolToRemove);
+    if (remaining.length < 2) {
+        window.location.href = "{{ url_for('compare') }}";
+        return;
+    }
+    window.location.href = `/compare-results?symbols=${encodeURIComponent(remaining.join(','))}`;
+}
+
+const addModal = document.getElementById("addStockModal");
+const addInput = document.getElementById("addStockSearchInput");
+const addStatus = document.getElementById("addStockSearchStatus");
+const addResults = document.getElementById("addStockSearchResults");
+let addSearchTimer = null;
+
+function openAddStockModal() {
+    if (!addModal) return;
+    addModal.classList.add("show");
+    document.body.classList.add("compare-modal-open");
+    addInput.value = "";
+    addResults.innerHTML = "";
+    addStatus.innerHTML = "Type at least 2 characters to search.";
+    setTimeout(() => addInput.focus(), 80);
+}
+
+function closeAddStockModal() {
+    if (!addModal) return;
+    addModal.classList.remove("show");
+    document.body.classList.remove("compare-modal-open");
+}
+
+if (addInput) {
+    addInput.addEventListener("input", function () {
+        clearTimeout(addSearchTimer);
+        const q = this.value.trim();
+        if (q.length < 2) {
+            addResults.innerHTML = "";
+            addStatus.innerHTML = "Type at least 2 characters to search.";
+            return;
+        }
+        addStatus.innerHTML = "Searching stocks...";
+        addSearchTimer = setTimeout(async function () {
+            try {
+                const res = await fetch(`/api/search-stocks?q=${encodeURIComponent(q)}`);
+                const stocks = await res.json();
+                renderAddResults(stocks);
+            } catch (err) {
+                addStatus.innerHTML = "Unable to search stocks right now.";
+            }
+        }, 300);
+    });
+}
+
+function renderAddResults(stocks) {
+    addResults.innerHTML = "";
+    if (!stocks || stocks.length === 0) {
+        addStatus.innerHTML = "No stocks found.";
+        return;
+    }
+    addStatus.innerHTML = `${stocks.length} stocks found`;
+    stocks.forEach(stock => {
+        const symbol = (stock.display_symbol || stock.symbol || "").replace(".NS", "").replace(".BO", "");
+        const name = stock.name || stock.longname || stock.shortname || symbol;
+
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "compare-search-item";
+        item.innerHTML = `
+            <div class="search-stock-logo">${name.charAt(0).toUpperCase()}</div>
+            <div class="search-stock-information">
+                <h4>${name}</h4>
+                <p>Stock • ${symbol}</p>
+            </div>
+            <i class="bi bi-plus-circle"></i>
+        `;
+        item.onclick = function () {
+            if (currentSymbols.includes(symbol)) {
+                addStatus.innerHTML = `<span style="color:#ef4444;">${symbol} is already in the comparison.</span>`;
+                return;
+            }
+            const updated = [...currentSymbols, symbol];
+            window.location.href = `/compare-results?symbols=${encodeURIComponent(updated.join(','))}`;
+        };
+        addResults.appendChild(item);
+    });
+}
+
+document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeAddStockModal();
+});
+</script>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/compare.js') }}"></script>
+{% endblock %}

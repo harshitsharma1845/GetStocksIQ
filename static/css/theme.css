@@ -1,0 +1,58 @@
+/* Typography-only layer: original project colours and component styling remain unchanged. */
+:root {
+    --font-heading: "Fraunces", Georgia, serif;
+    --font-body: "Inter", Arial, sans-serif;
+    --font-number: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+*,
+*::before,
+*::after {
+    font-family: var(--font-body);
+}
+
+/* Fraunces for display names and headings. */
+h1, h2, h3,
+.hero-left h1,
+.dashboard-heading h1,
+.navbar-brand-text strong,
+.company-name,
+.stock-name,
+.analysis-hero h1,
+.compare-hero h1,
+.auth-brand-name {
+    font-family: var(--font-heading) !important;
+    font-weight: 600;
+    letter-spacing: -.025em;
+}
+
+/* IBM Plex Mono for financial values, with aligned figures. */
+.hero-price,
+.hero-change,
+.hero-item strong,
+.stat-card h3,
+.holding-price,
+.holding-change,
+.mover-item b,
+.recommendation-item small,
+.signal-confidence b,
+.signal-targets strong,
+.overall-score-circle,
+.mini-score-card strong,
+.info-card p,
+.snapshot-metrics strong,
+.fundamentals-list strong,
+.target-box strong,
+.confidence-row strong,
+.stock-price,
+.stock-change,
+.metric-stock-values,
+.financial-bar-item strong,
+.price-chart-company strong,
+.dash-value,
+.number,
+.numeric-value {
+    font-family: var(--font-number) !important;
+    font-variant-numeric: tabular-nums slashed-zero;
+    letter-spacing: -.035em;
+}
