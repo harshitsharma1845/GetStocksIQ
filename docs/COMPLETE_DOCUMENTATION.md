@@ -4,7 +4,6 @@
 > **Repository:** [harshitsharma1845/GetStocksIQ](https://github.com/harshitsharma1845/GetStocksIQ)  
 > **Author & Maintainer:** Harshit Sharma (@harshitsharma1845)  
 > **Documentation Release:** August 2026  
-> **Generated PDF Report:** [`Stratix_AI_Complete_Documentation.pdf`](file:///d:/GetStockIQ/Stratix_AI_Complete_Documentation.pdf)
 
 ---
 

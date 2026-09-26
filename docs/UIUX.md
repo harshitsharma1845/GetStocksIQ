@@ -5,7 +5,6 @@
 * **Design Theme:** High-Contrast Institutional Glassmorphism
 * **Status:** Approved & Implementation Ready
 * **Author / UI/UX Architect:** Harshit Sharma (@harshitsharma1845)
-* **PDF Artifact:** [`UIUX_STRATIX_AI.pdf`](file:///d:/GetStockIQ/UIUX_STRATIX_AI.pdf)
 
 ---
 

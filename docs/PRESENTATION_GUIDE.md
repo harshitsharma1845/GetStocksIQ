@@ -4,7 +4,6 @@
 * **Brand Name:** **GetStockIQ**
 * **Project Repository:** [harshitsharma1845/GetStocksIQ](https://github.com/harshitsharma1845/GetStocksIQ)
 * **Author / Candidate:** Harshit Sharma (@harshitsharma1845)
-* **PDF Artifact:** [`GetStockIQ_Complete_Mentor_MasterGuide.pdf`](file:///d:/GetStockIQ/GetStockIQ_Complete_Mentor_MasterGuide.pdf)
 
 ---
 

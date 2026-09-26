@@ -5,7 +5,6 @@
 * **Release Target:** Production MVP
 * **Methodology:** Agile-Waterfall Hybrid
 * **Author / Lead Architect:** Harshit Sharma (@harshitsharma1845)
-* **PDF Artifact:** [`DEVPLAN_STRATIX_AI.pdf`](file:///d:/GetStockIQ/DEVPLAN_STRATIX_AI.pdf)
 
 ---
 

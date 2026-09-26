@@ -5,7 +5,6 @@
 * **Architecture Pattern:** Modular Monolith (Layered MVC + Quantitative Services)
 * **Status:** Approved & Production-Ready
 * **Author / System Architect:** Harshit Sharma (@harshitsharma1845)
-* **PDF Artifact:** [`SAD_STRATIX_AI.pdf`](file:///d:/GetStockIQ/SAD_STRATIX_AI.pdf)
 
 ---
 

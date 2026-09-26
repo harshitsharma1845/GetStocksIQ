@@ -256,7 +256,7 @@ def status():
         tables = inspector.get_table_names()
         applied = get_applied_revisions()
 
-        print("\n=== Stratix AI Database Status ===")
+        print("\n=== GetStockIQ Database Status ===")
         print(f"Dialect:              {db.engine.dialect.name}")
         print(f"Target URI:           {app.config['SQLALCHEMY_DATABASE_URI']}")
         print(f"Engine Options:       {app.config.get('SQLALCHEMY_ENGINE_OPTIONS', {})}")

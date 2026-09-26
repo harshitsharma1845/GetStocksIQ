@@ -33,3 +33,8 @@ instance/
 .DS_Store
 Thumbs.db
 
+# Scratch and Archive
+scratch/
+archive/
+
+

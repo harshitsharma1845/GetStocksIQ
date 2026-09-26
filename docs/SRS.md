@@ -5,7 +5,6 @@
 * **Version:** 1.0 (MVP)
 * **Status:** Approved & Production-Ready
 * **Author / System Architect:** Harshit Sharma (@harshitsharma1845)
-* **PDF Artifact:** [`SRS_STRATIX_AI.pdf`](file:///d:/GetStockIQ/SRS_STRATIX_AI.pdf)
 
 ---
 

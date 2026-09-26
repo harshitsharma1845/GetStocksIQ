@@ -5,7 +5,6 @@
 * **Status:** Approved & Implementation Ready
 * **Document Format:** Standard A4 Professional Specification
 * **Author / Maintainer:** Harshit Sharma (@harshitsharma1845)
-* **PDF Artifact:** [`PRD_STRATIX_AI.pdf`](file:///d:/GetStockIQ/PRD_STRATIX_AI.pdf)
 
 ---
 
