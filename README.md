@@ -13,6 +13,22 @@ The platform unifies real-time market data ingestion, a **7-Pillar Quantitative 
 
 ---
 
+## 📚 Complete Project Documentation Suite
+
+All detailed engineering, design, and architecture specifications are available in the [docs/](docs/) directory:
+
+| Document | Description | Format |
+| :--- | :--- | :---: |
+| 📄 **[PRD — Product Requirements Document](docs/PRD.md)** | Core problems, user personas, KPI metrics, 7-pillar model scope | Markdown |
+| 📄 **[SRS — Software Requirements Specification](docs/SRS.md)** | IEEE 830 standard specifications, functional & non-functional requirements | Markdown |
+| 📄 **[SAD — System Architecture Document](docs/SAD.md)** | Modular monolith design, 4-tier layer model, database ERD, caching strategy | Markdown |
+| 📄 **[UI/UX — Design & Component Specification](docs/UIUX.md)** | Glassmorphism design system, SVG bezier animations, responsive rules | Markdown |
+| 📄 **[DEVPLAN — Master Development Plan](docs/DEVPLAN.md)** | Engineering roadmap, agile milestones (M1–M9), release criteria | Markdown |
+| 📄 **[PRESENTATION_GUIDE — Team Presentation & Viva Guide](docs/PRESENTATION_GUIDE.md)** | Bilingual speaking scripts (Hinglish + English), live demo flows, viva Q&As | Markdown |
+| 📄 **[COMPLETE_DOCUMENTATION — Technical Deep-Dive](docs/COMPLETE_DOCUMENTATION.md)** | Comprehensive 140-point technical architecture & mathematical breakdown | Markdown |
+
+---
+
 ## 🏛️ System Architecture
 
 ```
